@@ -6,4 +6,12 @@
     <string name="description_likes_button">Likes Button</string>
     <string name="description_share_button">Share Button</string>
     <string name="description_viewing_button">Viewing Count</string>
+    <string name="menu_remove">Remove</string>
+    <string name="post_text">Post Text</string>
+    <string name="description_save_button">Save button</string>
+    <string name="error_empty_content">Content can\'t be empty</string>
+    <string name="edit">Edit</string>
+    <string name="icon_edite">Icon edite</string>
+    <string name="edit_message">Edit Message</string>
+    <string name="cancel_button">Undo edit button</string>
 </resources>

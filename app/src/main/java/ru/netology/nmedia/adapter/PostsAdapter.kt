@@ -2,6 +2,7 @@ package ru.netology.nmedia.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -9,19 +10,21 @@ import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardPostBinding
 import ru.netology.nmedia.dto.Post
 
-typealias OnLikeListener = (post: Post) -> Unit
-typealias OnShareListener = (post: Post) -> Unit
+interface OnInteractionListener {
+    fun onLike(post: Post)
+    fun onShare(post: Post)
+    fun onRemove(post: Post)
+    fun onEdit(post: Post)
+}
 
 
 class PostsAdapter(
-    private val onLikeListener: OnLikeListener,
-    private val onShareListener: OnShareListener
-) :
-    ListAdapter<Post, PostsViewHolder>(PostDiffCallBack) {
+    private val onInteractionListener: OnInteractionListener
+) : ListAdapter<Post, PostsViewHolder>(PostDiffCallBack) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostsViewHolder {
         val view = CardPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return PostsViewHolder(view, onLikeListener, onShareListener)
+        return PostsViewHolder(view, onInteractionListener)
     }
 
     override fun onBindViewHolder(holder: PostsViewHolder, position: Int) {
@@ -32,8 +35,7 @@ class PostsAdapter(
 
 class PostsViewHolder(
     private val binding: CardPostBinding,
-    private val onLikeListener: OnLikeListener,
-    private val onShareListener: OnShareListener
+    private val onInteractionListener: OnInteractionListener
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(post: Post) {
         with(binding) {
@@ -42,18 +44,35 @@ class PostsViewHolder(
             content.text = post.content
             like.setImageResource(if (post.likedByMe) R.drawable.ic_liked_24 else R.drawable.ic_unliked_24)
             likesCount.text = reformatCount(post.likes)
-//            likesCount.text = post.likes.toString()
             share.setImageResource(if (post.sharedByMe) R.drawable.ic_shared_24 else R.drawable.ic_unshared_24)
             shareCount.text = reformatCount(post.shares)
-//            shareCount.text = post.shares.toString()
             viewingCount.text = reformatCount(post.views)
-//            viewingCount.text = post.views.toString()
 
             like.setOnClickListener {
-                onLikeListener(post)
+                onInteractionListener.onLike(post)
             }
             share.setOnClickListener {
-                onShareListener(post)
+                onInteractionListener.onShare(post)
+            }
+            menu.setOnClickListener {
+                PopupMenu(it.context, it).apply {
+                    inflate(R.menu.options_post)
+                    setOnMenuItemClickListener { menuItem ->
+                        when (menuItem.itemId) {
+                            R.id.edit -> {
+                                onInteractionListener.onEdit(post)
+                                true
+                            }
+
+                            R.id.remove -> {
+                                onInteractionListener.onRemove(post)
+                                true
+                            }
+
+                            else -> false
+                        }
+                    }
+                }.show()
             }
         }
     }
