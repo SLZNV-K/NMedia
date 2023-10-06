@@ -42,10 +42,10 @@ class PostsViewHolder(
             author.text = post.author
             published.text = post.published
             content.text = post.content
-            like.setImageResource(if (post.likedByMe) R.drawable.ic_liked_24 else R.drawable.ic_unliked_24)
-            likesCount.text = reformatCount(post.likes)
-            share.setImageResource(if (post.sharedByMe) R.drawable.ic_shared_24 else R.drawable.ic_unshared_24)
-            shareCount.text = reformatCount(post.shares)
+            like.isChecked = post.likedByMe
+            like.text = reformatCount(post.likes)
+            share.isClickable = post.sharedByMe
+            share.text = reformatCount(post.shares)
             viewingCount.text = reformatCount(post.views)
 
             like.setOnClickListener {
