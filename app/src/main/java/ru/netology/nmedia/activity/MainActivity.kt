@@ -1,18 +1,17 @@
 package ru.netology.nmedia.activity
 
+import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
-import android.widget.Toast
+import androidx.activity.result.launch
 import androidx.activity.viewModels
-import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.ActivityMainBinding
 import ru.netology.nmedia.dto.Post
-import ru.netology.nmedia.util.AndroidUtils
-import ru.netology.nmedia.util.AndroidUtils.focusAndShowKeyboard
 import ru.netology.nmedia.viewmodel.PostViewModel
+
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,6 +20,23 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val viewModel: PostViewModel by viewModels()
+
+        val newPostContract =
+            registerForActivityResult(NewPostActivityContract()) { result ->
+                result ?: return@registerForActivityResult
+                viewModel.changeContent(result)
+                viewModel.save()
+            }
+        val editPostContract =
+            registerForActivityResult(EditPostActivityContract()) { result ->
+                if (result == null) {
+                    viewModel.cancel()
+                } else {
+                    viewModel.changeContent(result)
+                    viewModel.save()
+                }
+            }
+
         val adapter = PostsAdapter(object : OnInteractionListener {
             override fun onLike(post: Post) {
                 viewModel.likeById(post.id)
@@ -28,6 +44,13 @@ class MainActivity : AppCompatActivity() {
 
             override fun onShare(post: Post) {
                 viewModel.shareById(post.id)
+                val intent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, post.content)
+                    type = "text/plain"
+                }
+                val chooser = Intent.createChooser(intent, null)
+                startActivity(chooser)
             }
 
             override fun onRemove(post: Post) {
@@ -35,19 +58,19 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onEdit(post: Post) {
-                binding.group.visibility = View.VISIBLE
-                binding.oldContent.text = post.content
                 viewModel.edit(post)
+                editPostContract.launch(post.content)
+            }
+
+            override fun onLinkVideo(post: Post) {
+                val link = post.videoLink
+                val videoIntent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
+                val videoChooser = Intent.createChooser(videoIntent, null)
+//                startActivity(videoIntent)
+                startActivity(videoChooser)
             }
         }
         )
-
-        viewModel.edited.observe(this) { post ->
-            if (post.id != 0L) {
-                binding.content.setText(post.content)
-                binding.content.focusAndShowKeyboard()
-            }
-        }
         binding.list.adapter = adapter
         viewModel.data.observe(this) { posts ->
             val newPost = adapter.currentList.size < posts.size
@@ -55,29 +78,9 @@ class MainActivity : AppCompatActivity() {
                 if (newPost) binding.list.smoothScrollToPosition(0)
             }
         }
-
-        binding.save.setOnClickListener {
-            val text = binding.content.text.toString()
-            if (text.isBlank()) {
-                Toast.makeText(this, R.string.error_empty_content, Toast.LENGTH_LONG).show()
-                return@setOnClickListener
-            }
-            viewModel.changeContent(text)
-            viewModel.save()
-            binding.group.visibility = View.GONE
-            binding.content.setText("")
-            binding.content.clearFocus()
-            AndroidUtils.hideKeyboard(it)
-
+        binding.addNewPostButton.setOnClickListener {
+            newPostContract.launch()
         }
 
-        binding.cancel.setOnClickListener {
-            viewModel.cancel()
-            binding.group.visibility = View.GONE
-            binding.content.setText("")
-            binding.content.clearFocus()
-            AndroidUtils.hideKeyboard(it)
-
-        }
     }
 }

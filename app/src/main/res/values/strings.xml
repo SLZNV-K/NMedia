@@ -12,6 +12,13 @@
     <string name="error_empty_content">Content can\'t be empty</string>
     <string name="edit">Edit</string>
     <string name="icon_edite">Icon edite</string>
-    <string name="edit_message">Edit Message</string>
     <string name="cancel_button">Undo edit button</string>
+    <string name="empty_text_error">Text must not be blank</string>
+    <string name="description_add_post_button">Button for adding a post</string>
+    <string name="description_save_new_post_button">Save New Post</string>
+    <string name="title_edit_a_post">Edit a post</string>
+    <string name="description_video_preview">Video preview</string>
+    <string name="edit_message">Edit message</string>
+    <string name="description_play_button">Play button</string>
+    <string name="video_title_stub" translatable="false">Весна – открытый фильм Blender</string>
 </resources>
