@@ -50,9 +50,10 @@ class PostsViewHolder(
             share.text = reformatCount(post.shares)
             viewingCount.text = reformatCount(post.views)
 
-            if (post.videoLink != ""){
+
+            if (post.videoLink != "") {
                 group.visibility = View.VISIBLE
-            }
+            } else group.visibility = View.GONE
 
             videoPreviewButton.setOnClickListener {
                 onInteractionListener.onLinkVideo(post)
