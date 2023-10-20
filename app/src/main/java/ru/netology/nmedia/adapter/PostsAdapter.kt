@@ -17,6 +17,7 @@ interface OnInteractionListener {
     fun onRemove(post: Post)
     fun onEdit(post: Post)
     fun onLinkVideo(post: Post)
+    fun onPost(post: Post)
 }
 
 
@@ -49,8 +50,7 @@ class PostsViewHolder(
             share.isClickable = post.sharedByMe
             share.text = reformatCount(post.shares)
             viewingCount.text = reformatCount(post.views)
-
-
+            
             if (post.videoLink != "") {
                 group.visibility = View.VISIBLE
             } else group.visibility = View.GONE
@@ -86,6 +86,9 @@ class PostsViewHolder(
                         }
                     }
                 }.show()
+            }
+            root.setOnClickListener {
+                onInteractionListener.onPost(post)
             }
         }
     }

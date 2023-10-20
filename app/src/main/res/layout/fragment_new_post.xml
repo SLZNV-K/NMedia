@@ -3,15 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".activity.NewPostActivity">
+    android:layout_height="match_parent">
 
     <EditText
         android:id="@+id/newContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="top"
+        android:hint=""
         android:padding="@dimen/common_spacing"
+        android:inputType="text"
         tools:text="@tools:sample/lorem[57]"
         android:importantForAutofill="no"/>
 

@@ -58,7 +58,6 @@ class PostRepositoryFilesImpl(private val context: Context) : PostRepository {
     override fun removeById(id: Long) {
         posts = posts.filter { it.id != id }
         data.value = posts
-        sync()
     }
 
     override fun save(post: Post) {
