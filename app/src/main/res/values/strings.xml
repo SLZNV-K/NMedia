@@ -6,4 +6,26 @@
     <string name="description_likes_button">Likes Button</string>
     <string name="description_share_button">Share Button</string>
     <string name="description_viewing_button">Viewing Count</string>
+    <string name="menu_remove">Remove</string>
+    <string name="post_text">Post Text</string>
+    <string name="description_save_button">Save button</string>
+    <string name="error_empty_content">Content can\'t be empty</string>
+    <string name="edit">Edit</string>
+    <string name="icon_edite">Icon edite</string>
+    <string name="cancel_button">Undo edit button</string>
+    <string name="empty_text_error">Text must not be blank</string>
+    <string name="description_add_post_button">Button for adding a post</string>
+    <string name="description_save_new_post_button">Save New Post</string>
+    <string name="title_edit_a_post">Edit a post</string>
+    <string name="description_video_preview">Video preview</string>
+    <string name="edit_message">Edit message</string>
+    <string name="description_play_button">Play button</string>
+    <string name="video_title_stub" translatable="false">Весна – открытый фильм Blender</string>
+    <string name="cancel_editing">Cancel editing</string>
+    <string name="cancel_editing_text">Do you really want to undo the changes?</string>
+    <string name="cancel_post_creation_text">Do you really want to cancel the creation of the post?</string>
+    <string name="cancel_post_creation">Cancel the creation post</string>
+    <string name="yes">Да</string>
+    <string name="no">No</string>
+    <string name="new_post_hint">Here will be your post</string>
 </resources>

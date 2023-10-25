@@ -7,4 +7,25 @@
     <string name="description_share_button">Кнопка поделиться</string>
     <string name="description_viewing_button">Количество просмотров</string>
     <string name="description_likes_button">Кнопка лайка</string>
+    <string name="menu_remove">Удалить</string>
+    <string name="post_text">Текст поста</string>
+    <string name="description_save_button">Кнопка сохранения</string>
+    <string name="error_empty_content">Содеерщимое не может быть пустым</string>
+    <string name="edit">Редактировать</string>
+    <string name="icon_edite">Иконка редактирования</string>
+    <string name="description_video_preview">Превью видео</string>
+    <string name="edit_message">Редактирование сообщения</string>
+    <string name="cancel_button">Кнопка отмены редактирования</string>
+    <string name="empty_text_error">Нельзя отправить пустой текст</string>
+    <string name="description_add_post_button">Кнопка добавления поста</string>
+    <string name="description_save_new_post_button">Сохранить новый пост</string>
+    <string name="title_edit_a_post">Редактирование поста</string>
+    <string name="description_play_button">Кнопка play</string>
+    <string name="cancel_editing">Отмена редактирования</string>
+    <string name="cancel_editing_text">Вы действительно хотите отменить изменения?</string>
+    <string name="cancel_post_creation_text">Вы действительно хотите отменить создание поста?</string>
+    <string name="cancel_post_creation">Отмена создания поста</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="new_post_hint">Здесь будет ваш пост</string>
 </resources>
