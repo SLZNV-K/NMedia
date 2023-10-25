@@ -19,6 +19,13 @@
     <string name="empty_text_error">Нельзя отправить пустой текст</string>
     <string name="description_add_post_button">Кнопка добавления поста</string>
     <string name="description_save_new_post_button">Сохранить новый пост</string>
-    <string name="title_edit_a_post">Рудактирование поста</string>
+    <string name="title_edit_a_post">Редактирование поста</string>
     <string name="description_play_button">Кнопка play</string>
+    <string name="cancel_editing">Отмена редактирования</string>
+    <string name="cancel_editing_text">Вы действительно хотите отменить изменения?</string>
+    <string name="cancel_post_creation_text">Вы действительно хотите отменить создание поста?</string>
+    <string name="cancel_post_creation">Отмена создания поста</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="new_post_hint">Здесь будет ваш пост</string>
 </resources>

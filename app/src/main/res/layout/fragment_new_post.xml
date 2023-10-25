@@ -10,9 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="top"
-        android:hint=""
         android:padding="@dimen/common_spacing"
         android:inputType="text"
+        android:hint="@string/new_post_hint"
         tools:text="@tools:sample/lorem[57]"
         android:importantForAutofill="no"/>
 

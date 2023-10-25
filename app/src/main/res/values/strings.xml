@@ -21,4 +21,11 @@
     <string name="edit_message">Edit message</string>
     <string name="description_play_button">Play button</string>
     <string name="video_title_stub" translatable="false">Весна – открытый фильм Blender</string>
+    <string name="cancel_editing">Cancel editing</string>
+    <string name="cancel_editing_text">Do you really want to undo the changes?</string>
+    <string name="cancel_post_creation_text">Do you really want to cancel the creation of the post?</string>
+    <string name="cancel_post_creation">Cancel the creation post</string>
+    <string name="yes">Да</string>
+    <string name="no">No</string>
+    <string name="new_post_hint">Here will be your post</string>
 </resources>
