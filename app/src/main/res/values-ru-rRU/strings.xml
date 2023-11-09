@@ -28,4 +28,8 @@
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="new_post_hint">Здесь будет ваш пост</string>
+    <string name="channel_remote_name">Уведомления с сервера</string>
+    <string name="channel_remote_description">Уведомления с удаленного сервера</string>
+    <string name="notification_user_liked">Пользователь %1$s лайкнул пост %2$s</string>
+    <string name="notification_user_posted">Пользователь %1$s опубликовал новый пост</string>
 </resources>
