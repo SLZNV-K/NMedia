@@ -37,8 +37,9 @@ class FSMService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
+
         message.data["action"]?.let {
-            when (Actions.valueOf(it)) {
+            when (Actions.getValueOf(it)) {
                 Actions.LIKE -> handleLike(
                     Gson().fromJson(
                         message.data["content"],
@@ -52,10 +53,15 @@ class FSMService : FirebaseMessagingService() {
                         Post::class.java
                     )
                 )
+
+                Actions.ERROR -> println("The application cannot accept this push")
+//                    Toast.makeText(this, "The application cannot accept this push", Toast.LENGTH_LONG).show()
+
             }
         }
         println(Gson().toJson(message))
     }
+
 
     private fun handlePost(post: Post) {
         val intent = Intent(this, AppActivity::class.java)
@@ -114,7 +120,17 @@ class FSMService : FirebaseMessagingService() {
 }
 
 enum class Actions {
-    LIKE, POST
+    LIKE, POST, ERROR;
+
+    companion object {
+        fun getValueOf(actions: String): Actions {
+            return try {
+                valueOf(actions)
+            } catch (e: RuntimeException) {
+                ERROR
+            }
+        }
+    }
 }
 
 data class Like(
