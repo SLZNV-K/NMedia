@@ -2,11 +2,15 @@ package ru.netology.nmedia.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.model.FeedState
 import ru.netology.nmedia.repository.PostRepository
-import ru.netology.nmedia.repository.PostRepositorySQLiteImpl
+import ru.netology.nmedia.repository.PostRepositoryOkhttp
+import ru.netology.nmedia.util.SingleLiveEvent
+import java.io.IOException
+import kotlin.concurrent.thread
 
 private val empty = Post(
     id = 0,
@@ -17,22 +21,71 @@ private val empty = Post(
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository: PostRepository = PostRepositorySQLiteImpl(
-        AppDb.getInstance(application).postDao
-    )
-
-    val data = repository.get()
+    private val repository: PostRepository = PostRepositoryOkhttp()
+    private val _state = MutableLiveData(FeedState())
+    val data: LiveData<FeedState>
+        get() = _state
     private val edited = MutableLiveData(empty)
 
-    fun likeById(id: Long) = repository.likeById(id)
+    private val _postCreated = SingleLiveEvent<Unit>()
+    val postCreated: LiveData<Unit>
+        get() = _postCreated
 
-    fun shareById(id: Long) = repository.shareById(id)
-    fun removeById(id: Long) = repository.removeById(id)
-    fun save() {
-        edited.value?.let {
-            repository.save(it)
+    init {
+        load()
+    }
+
+    fun load() {
+        thread {
+            _state.postValue(FeedState(loading = true))
+            try {
+                val posts = repository.getAll()
+                _state.postValue(FeedState(posts = posts, empty = posts.isEmpty()))
+            } catch (e: Exception) {
+                _state.postValue(FeedState(error = true))
+            }
         }
-        edited.value = empty
+    }
+
+    fun likeById(post: Post) {
+        thread {
+            if (!post.likedByMe) repository.likeById(post.id) else repository.dislikeById(post.id)
+            val posts = repository.getAll()
+            _state.postValue(FeedState(posts = posts, empty = posts.isEmpty()))
+        }
+    }
+
+    fun shareById(id: Long) {
+        thread { repository.shareById(id) }
+    }
+
+    fun removeById(id: Long) {
+        thread {
+            // Оптимистичная модель
+            val old = _state.value?.posts.orEmpty()
+            _state.postValue(
+                _state.value?.copy(posts = _state.value?.posts.orEmpty()
+                    .filter { it.id != id }
+                )
+            )
+            try {
+                repository.removeById(id)
+            } catch (e: IOException) {
+                _state.postValue(_state.value?.copy(posts = old))
+            }
+        }
+    }
+
+    fun save() {
+        thread {
+            edited.value?.let {
+                repository.save(it)
+                edited.postValue(empty)
+                _postCreated.postValue(Unit)
+                load()
+            }
+        }
+
     }
 
     fun edit(post: Post) {

@@ -25,8 +25,8 @@ class PostDetailsFragment : Fragment() {
         val viewModel: PostViewModel by activityViewModels()
         val id = arguments?.textArg.orEmpty().toLong()
 
-        viewModel.data.observe(viewLifecycleOwner) {
-            val post = it.find { post -> post.id == id }
+        viewModel.data.observe(viewLifecycleOwner) {state ->
+        val post = state.posts.find { it.id == id }
             if (post == null) {
                 findNavController().navigateUp()
                 return@observe
@@ -42,7 +42,7 @@ class PostDetailsFragment : Fragment() {
                 viewingCount.text = reformatCount(post.views)
 
                 like.setOnClickListener {
-                    viewModel.likeById(post.id)
+                    viewModel.likeById(post)
                 }
                 share.setOnClickListener {
                     viewModel.shareById(post.id)

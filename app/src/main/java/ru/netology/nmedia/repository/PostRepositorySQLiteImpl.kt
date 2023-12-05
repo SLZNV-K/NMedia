@@ -1,30 +1,37 @@
 package ru.netology.nmedia.repository
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
 import ru.netology.nmedia.dao.PostDao
 import ru.netology.nmedia.dto.Post
-import ru.netology.nmedia.entity.PostEntity
 
 class PostRepositorySQLiteImpl(
     private val dao: PostDao
 ) : PostRepository {
 
-
-    override fun get(): LiveData<List<Post>> = dao.getAll().map { posts ->
-        posts.map {
-            it.toDto()
-        }
+    override fun getAll(): List<Post> {
+        TODO("Not yet implemented")
     }
 
-    override fun save(post: Post) {
-        dao.save(PostEntity.fromDto(post))
+    override fun likeById(id: Long): Post {
+        TODO("Not yet implemented")
     }
 
-    override fun likeById(id: Long) {
-        dao.likeById(id)
-
+    override fun dislikeById(id: Long): Post {
+        TODO("Not yet implemented")
     }
+//    override fun get(): LiveData<List<Post>> = dao.getAll().map { posts ->
+//        posts.map {
+//            it.toDto()
+//        }
+//    }
+
+//    override fun save(post: Post) {
+//        dao.save(PostEntity.fromDto(post))
+//    }
+
+//    override fun likeById(id: Long) {
+//        dao.likeById(id)
+//
+//    }
 
     override fun shareById(id: Long) {
         dao.shareById(id)
@@ -32,5 +39,9 @@ class PostRepositorySQLiteImpl(
 
     override fun removeById(id: Long) {
         dao.removeById(id)
+    }
+
+    override fun save(post: Post): Post {
+        TODO("Not yet implemented")
     }
 }

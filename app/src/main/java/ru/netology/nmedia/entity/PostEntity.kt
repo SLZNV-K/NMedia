@@ -28,7 +28,6 @@ data class PostEntity(
         shares = shares,
         sharedByMe = sharedByMe,
         views = views,
-        videoLink = videoLink,
     )
 
     companion object {
@@ -43,7 +42,6 @@ data class PostEntity(
                 shares = shares,
                 sharedByMe = sharedByMe,
                 views = views,
-                videoLink = videoLink
             )
         }
     }

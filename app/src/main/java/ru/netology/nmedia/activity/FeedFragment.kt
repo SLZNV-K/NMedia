@@ -1,11 +1,11 @@
 package ru.netology.nmedia.activity
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -31,7 +31,7 @@ class FeedFragment : Fragment() {
 
         val adapter = PostsAdapter(object : OnInteractionListener {
             override fun onLike(post: Post) {
-                viewModel.likeById(post.id)
+                viewModel.likeById(post)
             }
 
             override fun onShare(post: Post) {
@@ -57,29 +57,34 @@ class FeedFragment : Fragment() {
                 viewModel.edit(post)
             }
 
-            override fun onLinkVideo(post: Post) {
-                val link = post.videoLink
-                val videoIntent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
-                val videoChooser = Intent.createChooser(videoIntent, null)
-                startActivity(videoChooser)
-            }
-
             override fun onPost(post: Post) {
                 findNavController()
-                    .navigate(R.id.action_feedFragment_to_postDetailsFragment, Bundle().apply {textArg = post.id.toString()})
+                    .navigate(
+                        R.id.action_feedFragment_to_postDetailsFragment,
+                        Bundle().apply { textArg = post.id.toString() })
             }
         }
         )
-        binding.list.adapter = adapter
-        viewModel.data.observe(viewLifecycleOwner) { posts ->
-            val newPost = adapter.currentList.size < posts.size
-            adapter.submitList(posts) {
-                if (newPost) binding.list.smoothScrollToPosition(0)
+        with(binding) {
+            list.adapter = adapter
+            viewModel.data.observe(viewLifecycleOwner) { state ->
+                adapter.submitList(state.posts)
+                progress.isVisible = state.loading
+                errorGroup.isVisible = state.error
+                emptyText.isVisible = state.empty
             }
+            retryButton.setOnClickListener {
+                viewModel.load()
+            }
+            swiperefresh.setOnRefreshListener {
+                viewModel.load()
+                swiperefresh.isRefreshing = false
+            }
+
+            addNewPostButton.setOnClickListener {
+                findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
+            }
+            return root
         }
-        binding.addNewPostButton.setOnClickListener {
-            findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
-        }
-        return binding.root
     }
 }

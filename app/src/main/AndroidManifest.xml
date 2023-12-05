@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
     <!--    package="ru.netology.nmedia"-->
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,7 +14,8 @@
         android:roundIcon="@mipmap/ic_launcher_playstore"
         android:supportsRtl="true"
         android:theme="@style/Theme.NMedia"
-        tools:targetApi="34">
+        tools:targetApi="34"
+        android:usesCleartextTraffic="${useClearTextTraffic}">
 
         <activity
             android:name=".activity.AppActivity"
