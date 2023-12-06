@@ -24,11 +24,13 @@ class PostRepositoryOkhttp : PostRepository {
 
     override fun getAll(): List<Post> {
         val request = Request.Builder()
-            .url("${BASE_URL}/api/posts")
+            .url("${BASE_URL}/api/slow/posts")
             .build()
 
-        return client.newCall(request).execute().body?.string().let { gson.fromJson(it, typeToken) }
-
+        return client.newCall(request)
+            .execute()
+            .let { it.body?.string() ?: throw RuntimeException("bode is null") }
+            .let { gson.fromJson(it, typeToken) }
     }
 
     override fun likeById(id: Long): Post {
@@ -52,13 +54,13 @@ class PostRepositoryOkhttp : PostRepository {
     }
 
     override fun shareById(id: Long) {
-        //TODO
+
     }
 
     override fun removeById(id: Long) {
         val request = Request.Builder()
             .delete()
-            .url("${BASE_URL}/api/posts/$id")
+            .url("${BASE_URL}/api/slow/posts/$id")
             .build()
 
         client.newCall(request).execute().close()

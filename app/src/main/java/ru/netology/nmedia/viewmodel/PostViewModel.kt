@@ -49,9 +49,12 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     fun likeById(post: Post) {
         thread {
-            if (!post.likedByMe) repository.likeById(post.id) else repository.dislikeById(post.id)
-            val posts = repository.getAll()
-            _state.postValue(FeedState(posts = posts, empty = posts.isEmpty()))
+            val updatePost =
+                if (!post.likedByMe) repository.likeById(post.id) else repository.dislikeById(post.id)
+            val updatePosts = _state.value?.posts?.map {
+                if (it.id == updatePost.id) updatePost else it
+            }
+            _state.postValue(_state.value?.copy(posts = updatePosts.orEmpty()))
         }
     }
 
