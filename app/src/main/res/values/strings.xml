@@ -28,4 +28,11 @@
     <string name="yes">Да</string>
     <string name="no">No</string>
     <string name="new_post_hint">Here will be your post</string>
+    <string name="channel_remote_name">Server notifications</string>
+    <string name="channel_remote_description">Notifications from remote server</string>
+    <string name="notification_user_liked">User %1$s liked %2$s\'s post</string>
+    <string name="notification_user_posted">User %1$s published a new post</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="retry">Retry</string>
+    <string name="no_posts_yet">No posts yet</string>
 </resources>

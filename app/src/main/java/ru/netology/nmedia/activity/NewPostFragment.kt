@@ -39,6 +39,7 @@ class NewPostFragment : Fragment() {
                 val content = binding.newContent.text.toString()
                 viewModel.changeContent(content)
                 viewModel.save()
+                AndroidUtils.hideKeyboard(requireView())
                 editor?.clear()
                 editor?.apply()
                 findNavController().navigateUp()
@@ -47,7 +48,12 @@ class NewPostFragment : Fragment() {
                     .show()
             }
         }
-
+        viewModel.postCreated.observe(viewLifecycleOwner){
+            AndroidUtils.hideKeyboard(requireView())
+            editor?.clear()
+            editor?.apply()
+            findNavController().navigateUp()
+        }
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner, object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
