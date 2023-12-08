@@ -74,17 +74,15 @@ class PostRepositoryInMemoryImpl : PostRepository {
         ),
     )
     private val data = MutableLiveData(posts)
-    override fun getAll(): List<Post> {
+    override fun getAllAsync(callBack: PostRepository.GetAllCallBack<List<Post>>) {}
+    override fun likeById(id: Long, callBack: PostRepository.GetAllCallBack<Post>) {
         TODO("Not yet implemented")
     }
 
-    override fun likeById(id: Long): Post {
+    override fun dislikeById(id: Long, callBack: PostRepository.GetAllCallBack<Post>) {
         TODO("Not yet implemented")
     }
 
-    override fun dislikeById(id: Long): Post {
-        TODO("Not yet implemented")
-    }
 
 //    override fun get(): LiveData<List<Post>> = data
 
@@ -108,14 +106,19 @@ class PostRepositoryInMemoryImpl : PostRepository {
         data.value = posts
     }
 
-    override fun removeById(id: Long) {
-        posts = posts.filter { it.id != id }
-        data.value = posts
-    }
-
-    override fun save(post: Post): Post {
+    override fun removeById(id: Long, callBack: PostRepository.GetAllCallBack<Unit>) {
         TODO("Not yet implemented")
     }
+
+//    override fun removeById(id: Long) {
+//        posts = posts.filter { it.id != id }
+//        data.value = posts
+//    }
+
+    override fun save(post: Post, callBack: PostRepository.GetAllCallBack<Post>) {
+        TODO("Not yet implemented")
+    }
+
 
 //    override fun save(post: Post) {
 //        posts = if (post.id == 0L) {
