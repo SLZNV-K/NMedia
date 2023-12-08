@@ -13,6 +13,7 @@ import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.EditPostFragment.Companion.textArg
 import ru.netology.nmedia.adapter.reformatCount
 import ru.netology.nmedia.databinding.FragmentPostDetailsBinding
+import ru.netology.nmedia.util.load
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 class PostDetailsFragment : Fragment() {
@@ -25,21 +26,28 @@ class PostDetailsFragment : Fragment() {
         val viewModel: PostViewModel by activityViewModels()
         val id = arguments?.textArg.orEmpty().toLong()
 
-        viewModel.data.observe(viewLifecycleOwner) {state ->
-        val post = state.posts.find { it.id == id }
+        viewModel.data.observe(viewLifecycleOwner) { state ->
+            val post = state.posts.find { it.id == id }
             if (post == null) {
                 findNavController().navigateUp()
                 return@observe
             }
+            val BASE_URL = "http://10.0.2.2:9999"
             with(binding) {
                 author.text = post.author
                 published.text = post.published
+                avatar.load("${BASE_URL}/avatars/${post.authorAvatar}", true)
                 newContent.text = post.content
                 like.isChecked = post.likedByMe
                 like.text = reformatCount(post.likes)
                 share.isClickable = post.sharedByMe
                 share.text = reformatCount(post.shares)
                 viewingCount.text = reformatCount(post.views)
+
+                if (post.attachment != null) {
+                    attachment.visibility = View.VISIBLE
+                    attachment.load("${BASE_URL}/images/${post.attachment!!.url}")
+                }
 
                 like.setOnClickListener {
                     viewModel.likeById(post)
@@ -67,10 +75,12 @@ class PostDetailsFragment : Fragment() {
                                     viewModel.edit(post)
                                     true
                                 }
+
                                 R.id.remove -> {
                                     viewModel.removeById(post.id)
                                     true
                                 }
+
                                 else -> false
                             }
                         }

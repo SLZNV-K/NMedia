@@ -52,6 +52,7 @@ class PostsViewHolder(
             share.isClickable = post.sharedByMe
             share.text = reformatCount(post.shares)
             viewingCount.text = reformatCount(post.views)
+            attachment.visibility = View.GONE
 
             if (post.attachment != null){
                 attachment.visibility = View.VISIBLE
