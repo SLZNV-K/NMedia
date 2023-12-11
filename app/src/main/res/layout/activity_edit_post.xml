@@ -34,7 +34,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/common_spacing"
-        android:src="@drawable/baseline_cancel_24"
+        android:src="@drawable/cancel_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/barrier_top"
@@ -62,7 +62,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/common_spacing"
         android:contentDescription="@string/description_save_new_post_button"
-        android:src="@drawable/baseline_check_24"
+        android:src="@drawable/check_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

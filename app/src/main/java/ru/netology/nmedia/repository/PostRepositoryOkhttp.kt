@@ -48,7 +48,6 @@ class PostRepositoryOkhttp : PostRepository {
             })
     }
 
-
     override fun likeById(id: Long, callBack: PostRepository.GetAllCallBack<Post>) {
         val request = Request.Builder()
             .url("${BASE_URL}/api/posts/$id/likes")

@@ -15,6 +15,7 @@ private val empty = Post(
     id = 0,
     content = "",
     author = "",
+    authorAvatar = "",
     published = ""
 )
 

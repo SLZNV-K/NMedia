@@ -11,7 +11,7 @@
         android:layout_width="@dimen/post_avatar_size"
         android:layout_height="@dimen/post_avatar_size"
         android:contentDescription="@string/description_post_author_avatar"
-        android:src="@drawable/posts_avatar_drawable"
+        tools:src="@drawable/posts_avatar_drawable"
         app:layout_constraintBottom_toBottomOf="@id/barrierHead"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -72,6 +72,18 @@
         android:autoLink="web"
         app:layout_constraintTop_toBottomOf="@id/barrierHead"
         tools:text="@sample/posts.json/data/content" />
+
+    <ImageView
+        android:id="@+id/attachment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/newContent"
+        app:layout_constraintBottom_toTopOf="@id/barrierBody"
+        tools:src="@drawable/img_video_preview"
+        android:contentDescription="@string/attachment_for_the_post"
+        android:visibility="gone"/>
 
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrierBody"
