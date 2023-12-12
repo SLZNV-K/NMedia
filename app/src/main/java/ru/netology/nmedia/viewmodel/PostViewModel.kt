@@ -7,7 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedState
 import ru.netology.nmedia.repository.PostRepository
-import ru.netology.nmedia.repository.PostRepositoryOkhttp
+import ru.netology.nmedia.repository.PostRepositoryRetrofitImpl
 import ru.netology.nmedia.util.SingleLiveEvent
 import kotlin.concurrent.thread
 
@@ -21,7 +21,7 @@ private val empty = Post(
 
 class PostViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository: PostRepository = PostRepositoryOkhttp()
+    private val repository: PostRepository = PostRepositoryRetrofitImpl()
     private val _state = MutableLiveData(FeedState())
     val data: LiveData<FeedState>
         get() = _state
@@ -39,11 +39,11 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         _state.postValue(FeedState(loading = true))
         repository.getAllAsync(object : PostRepository.GetAllCallBack<List<Post>> {
             override fun onSuccess(data: List<Post>) {
-                _state.postValue(FeedState(posts = data, empty = data.isEmpty()))
+                _state.value = FeedState(posts = data, empty = data.isEmpty())
             }
 
             override fun onError(e: Exception) {
-                _state.postValue(FeedState(error = true))
+                _state.value = FeedState(error = true)
             }
         })
     }
@@ -55,11 +55,11 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 override fun onSuccess(data: Post) {
                     val updatePosts =
                         _state.value?.posts?.map { if (it.id == data.id) data else it }
-                    _state.postValue(_state.value?.copy(posts = updatePosts.orEmpty()))
+                    _state.value = _state.value?.copy(posts = updatePosts.orEmpty())
                 }
 
                 override fun onError(e: Exception) {
-                    _state.postValue(FeedState(error = true))
+                    _state.value = FeedState(error = true)
                 }
 
             }) else repository.dislikeById(post.id,
@@ -67,11 +67,11 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 override fun onSuccess(data: Post) {
                     val updatePosts =
                         _state.value?.posts?.map { if (it.id == data.id) data else it }
-                    _state.postValue(_state.value?.copy(posts = updatePosts.orEmpty()))
+                    _state.value = _state.value?.copy(posts = updatePosts.orEmpty())
                 }
 
                 override fun onError(e: Exception) {
-                    _state.postValue(FeedState(error = true))
+                    _state.value = FeedState(error = true)
                 }
 
             })
@@ -84,32 +84,28 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
     fun removeById(id: Long) {
         repository.removeById(id, object : PostRepository.GetAllCallBack<Unit> {
             override fun onSuccess(data: Unit) {
-                _state.postValue(
-                    _state.value?.copy(posts = _state.value?.posts.orEmpty()
-                        .filter { it.id != id }
-                    )
+                _state.value = _state.value?.copy(posts = _state.value?.posts.orEmpty()
+                    .filter { it.id != id }
                 )
             }
 
             override fun onError(e: Exception) {
-                _state.postValue(FeedState(error = true))
+                _state.value = FeedState(error = true)
             }
-
         })
-
     }
 
     fun save() {
         edited.value?.let {
             repository.save(it, object : PostRepository.GetAllCallBack<Post> {
                 override fun onSuccess(data: Post) {
-                    edited.postValue(empty)
-                    _postCreated.postValue(Unit)
+                    edited.value = empty
+                    _postCreated.value = Unit
                     load()
                 }
 
                 override fun onError(e: Exception) {
-                    _state.postValue(FeedState(error = true))
+                    _state.value = FeedState(error = true)
                 }
             })
         }
