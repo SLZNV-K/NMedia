@@ -54,24 +54,24 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             object : PostRepository.GetAllCallBack<Post> {
                 override fun onSuccess(data: Post) {
                     val updatePosts =
-                        _state.value?.posts?.map { if (it.id == data.id) data else it }
-                    _state.value = _state.value?.copy(posts = updatePosts.orEmpty())
+                        _state.value?.posts?.map { if (it.id == data.id) data else it }.orEmpty()
+                    _state.value = FeedState(posts = updatePosts, empty = updatePosts.isEmpty())
                 }
 
                 override fun onError(e: Exception) {
-                    _state.value = FeedState(actionError = true)
+                    _state.value = _state.value?.copy(actionError = true)
                 }
 
             }) else repository.dislikeById(post.id,
             object : PostRepository.GetAllCallBack<Post> {
                 override fun onSuccess(data: Post) {
                     val updatePosts =
-                        _state.value?.posts?.map { if (it.id == data.id) data else it }
-                    _state.value = _state.value?.copy(posts = updatePosts.orEmpty())
+                        _state.value?.posts?.map { if (it.id == data.id) data else it }.orEmpty()
+                    _state.value = FeedState(posts = updatePosts, empty = updatePosts.isEmpty())
                 }
 
                 override fun onError(e: Exception) {
-                    _state.value = FeedState(actionError = true)
+                    _state.value = _state.value?.copy(actionError = true)
                 }
             })
     }

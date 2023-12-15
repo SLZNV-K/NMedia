@@ -73,7 +73,7 @@ class FeedFragment : Fragment() {
                 if(state.actionError){
                     Toast.makeText(
                         context,
-                        "Something went wrong",
+                        R.string.something_went_wrong,
                         Toast.LENGTH_LONG
                     ).show()
                 } else {
