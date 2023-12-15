@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -28,6 +29,14 @@ class PostDetailsFragment : Fragment() {
 
         viewModel.data.observe(viewLifecycleOwner) { state ->
             val post = state.posts.find { it.id == id }
+            if (state.actionError) {
+                Toast.makeText(
+                    context,
+                    "Something went wrong",
+                    Toast.LENGTH_LONG
+                ).show()
+                return@observe
+            }
             if (post == null) {
                 findNavController().navigateUp()
                 return@observe

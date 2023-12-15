@@ -7,4 +7,5 @@ data class FeedState(
     val loading: Boolean = false,
     val error: Boolean = false,
     val empty: Boolean = false,
+    val actionError: Boolean = false
 )

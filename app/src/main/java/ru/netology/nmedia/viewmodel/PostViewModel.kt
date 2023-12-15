@@ -59,7 +59,7 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
                 override fun onError(e: Exception) {
-                    _state.value = FeedState(error = true)
+                    _state.value = FeedState(actionError = true)
                 }
 
             }) else repository.dislikeById(post.id,
@@ -71,9 +71,8 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
                 override fun onError(e: Exception) {
-                    _state.value = FeedState(error = true)
+                    _state.value = FeedState(actionError = true)
                 }
-
             })
     }
 
