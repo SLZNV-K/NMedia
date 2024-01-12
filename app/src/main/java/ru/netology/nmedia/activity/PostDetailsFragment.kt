@@ -27,9 +27,8 @@ class PostDetailsFragment : Fragment() {
         val viewModel: PostViewModel by activityViewModels()
         val id = arguments?.textArg.orEmpty().toLong()
 
-        viewModel.data.observe(viewLifecycleOwner) { state ->
-            val post = state.posts.find { it.id == id }
-            if (state.actionError) {
+        viewModel.dataState.observe(viewLifecycleOwner){
+            if (it.error){
                 Toast.makeText(
                     context,
                     "Something went wrong",
@@ -37,6 +36,9 @@ class PostDetailsFragment : Fragment() {
                 ).show()
                 return@observe
             }
+        }
+        viewModel.data.observe(viewLifecycleOwner) { state ->
+            val post = state.posts.find { it.id == id }
             if (post == null) {
                 findNavController().navigateUp()
                 return@observe

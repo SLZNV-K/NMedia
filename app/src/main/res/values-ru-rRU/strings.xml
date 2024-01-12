@@ -36,4 +36,5 @@
     <string name="retry">Повторить</string>
     <string name="no_posts_yet">Постов еще нет</string>
     <string name="attachment_for_the_post">Вложение для поста</string>
+    <string name="retry_loading">Повторить загрузку</string>
 </resources>

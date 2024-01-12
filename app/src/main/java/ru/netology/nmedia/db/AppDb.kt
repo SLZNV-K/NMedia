@@ -1,15 +1,15 @@
 package ru.netology.nmedia.db
 
+import ru.netology.nmedia.entity.PostEntity
 import android.content.Context
 import androidx.room.Database
-import androidx.room.Room.databaseBuilder
+import androidx.room.Room
 import androidx.room.RoomDatabase
 import ru.netology.nmedia.dao.PostDao
-import ru.netology.nmedia.entity.PostEntity
 
-@Database(entities = [PostEntity::class], version = 1)
+@Database(entities = [PostEntity::class], version = 1, exportSchema = false)
 abstract class AppDb : RoomDatabase() {
-    abstract val postDao: PostDao
+    abstract fun postDao(): PostDao
 
     companion object {
         @Volatile
@@ -17,15 +17,13 @@ abstract class AppDb : RoomDatabase() {
 
         fun getInstance(context: Context): AppDb {
             return instance ?: synchronized(this) {
-                instance ?: buildDatabase(context)
-                    .also { instance = it }
+                instance ?: buildDatabase(context).also { instance = it }
             }
         }
 
         private fun buildDatabase(context: Context) =
-            databaseBuilder(context, AppDb::class.java, "appdb.db")
+            Room.databaseBuilder(context, AppDb::class.java, "app.db")
                 .fallbackToDestructiveMigration()
-                .allowMainThreadQueries()
                 .build()
     }
 }

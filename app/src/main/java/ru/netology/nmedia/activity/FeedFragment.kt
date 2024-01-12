@@ -5,11 +5,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.EditPostFragment.Companion.textArg
 import ru.netology.nmedia.adapter.OnInteractionListener
@@ -69,26 +69,23 @@ class FeedFragment : Fragment() {
         with(binding) {
 
             list.adapter = adapter
-            viewModel.data.observe(viewLifecycleOwner) { state ->
-                if(state.actionError){
-                    Toast.makeText(
-                        context,
-                        R.string.something_went_wrong,
-                        Toast.LENGTH_LONG
-                    ).show()
-                } else {
-                    adapter.submitList(state.posts)
-                    progress.isVisible = state.loading
-                    errorGroup.isVisible = state.error
-                    emptyText.isVisible = state.empty
+
+            viewModel.dataState.observe(viewLifecycleOwner) { state ->
+                progress.isVisible = state.loading
+                swiperefresh.isRefreshing = state.refreshing
+                if (state.error) {
+                    Snackbar.make(root, "Error loading", Snackbar.LENGTH_LONG)
+                        .setAction(R.string.retry_loading) { viewModel.load() }
+                        .show()
                 }
             }
-            retryButton.setOnClickListener {
-                viewModel.load()
+            viewModel.data.observe(viewLifecycleOwner) { state ->
+                adapter.submitList(state.posts)
+                emptyText.isVisible = state.empty
             }
+
             swiperefresh.setOnRefreshListener {
-                viewModel.load()
-                swiperefresh.isRefreshing = false
+                viewModel.refreshPosts()
             }
 
             addNewPostButton.setOnClickListener {

@@ -3,7 +3,6 @@ package ru.netology.nmedia.api
 import com.google.firebase.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
@@ -34,19 +33,19 @@ private val retrofit = Retrofit.Builder()
 
 interface PostApi {
     @GET("posts")
-    fun getAll(): Call<List<Post>>
+    suspend fun getAll(): List<Post>
 
     @POST("posts")
-    fun save(@Body post: Post): Call<Post>
+    suspend fun save(@Body post: Post): Post
 
     @DELETE("posts/{id}")
-    fun delete(@Path("id") id: Long): Call<Unit>
+    suspend fun delete(@Path("id") id: Long)
 
     @POST("posts/{id}/likes")
-    fun like(@Path("id") id: Long): Call<Post>
+    suspend fun like(@Path("id") id: Long): Post
 
     @DELETE("posts/{id}/likes")
-    fun dislike(@Path("id") id: Long): Call<Post>
+    suspend fun dislike(@Path("id") id: Long): Post
 }
 
 object PostApiService {
