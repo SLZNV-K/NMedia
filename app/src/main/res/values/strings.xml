@@ -37,4 +37,5 @@
     <string name="no_posts_yet">No posts yet</string>
     <string name="attachment_for_the_post">Attachment for the post</string>
     <string name="retry_loading">Retry loading</string>
+    <string name="the_sign_of_sending_a_post_to_the_server">The sign of sending a post to the server</string>
 </resources>

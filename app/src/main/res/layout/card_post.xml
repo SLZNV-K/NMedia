@@ -44,6 +44,15 @@
         app:layout_constraintStart_toEndOf="@id/avatar"
         app:layout_constraintTop_toBottomOf="@id/author"
         tools:text="@sample/posts.json/data/published" />
+    <ImageView
+        android:id="@+id/savedOnServer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/done_db_24"
+        app:layout_constraintStart_toStartOf="@id/published"
+        app:layout_constraintTop_toBottomOf="@id/published"
+        app:layout_constraintBottom_toTopOf="@id/barrierHead"
+        android:contentDescription="@string/the_sign_of_sending_a_post_to_the_server"/>
 
 
     <Button

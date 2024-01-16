@@ -12,10 +12,6 @@ data class Post(
     val sharedByMe: Boolean = false,
     val views: Int = 0,
     var attachment: Attachment? = null,
+    var isSaveOnService: Boolean = false
 )
 
-data class Attachment(
-    val url: String,
-    val description: String?,
-    val type: AttachmentType,
-)

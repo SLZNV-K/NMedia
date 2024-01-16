@@ -54,6 +54,10 @@ class PostsViewHolder(
             viewingCount.text = reformatCount(post.views)
             attachment.visibility = View.GONE
 
+            if (post.isSaveOnService){
+                savedOnServer.setImageResource(R.drawable.done_service)
+            } else savedOnServer.setImageResource(R.drawable.done_db_24)
+
             if (post.attachment != null){
                 attachment.visibility = View.VISIBLE
                 attachment.load("${BASE_URL}/images/${post.attachment!!.url}")

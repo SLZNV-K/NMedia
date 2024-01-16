@@ -9,6 +9,7 @@ import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.PostEntity.Companion.fromDto
 import ru.netology.nmedia.entity.toDto
 import ru.netology.nmedia.entity.toEntity
+import ru.netology.nmedia.error.ApiError
 import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
 
@@ -16,8 +17,13 @@ class PostRepositoryRetrofitImpl(private val dao: PostDao) : PostRepository {
     override val data = dao.getAll().map(List<PostEntity>::toDto)
     override suspend fun getAll() {
         try {
-            val posts = PostApiService.service.getAll()
-            dao.insert(posts.toEntity())
+            val response = PostApiService.service.getAll()
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            body.map { it.isSaveOnService=true }
+            dao.insert(body.toEntity())
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
@@ -28,10 +34,16 @@ class PostRepositoryRetrofitImpl(private val dao: PostDao) : PostRepository {
     override suspend fun likeById(id: Long) {
         dao.likeById(id)
         try {
-            PostApiService.service.like(id)
+            val response = PostApiService.service.like(id)
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            response.body() ?: throw ApiError(response.code(), response.message())
         } catch (e: IOException) {
+            dao.likeById(id)
             throw NetworkError
         } catch (e: Exception) {
+            dao.likeById(id)
             throw UnknownError
         }
     }
@@ -39,10 +51,16 @@ class PostRepositoryRetrofitImpl(private val dao: PostDao) : PostRepository {
     override suspend fun dislikeById(id: Long) {
         dao.likeById(id)
         try {
-            PostApiService.service.dislike(id)
+            val response = PostApiService.service.dislike(id)
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            response.body() ?: throw ApiError(response.code(), response.message())
         } catch (e: IOException) {
+            dao.likeById(id)
             throw NetworkError
         } catch (e: Exception) {
+            dao.likeById(id)
             throw UnknownError
         }
     }
@@ -69,9 +87,15 @@ class PostRepositoryRetrofitImpl(private val dao: PostDao) : PostRepository {
     }
 
     override suspend fun save(post: Post) {
-        dao.save(fromDto(post))
+//        dao.insert(fromDto(post))
         try {
-            PostApiService.service.save(post)
+            val response = PostApiService.service.save(post)
+            if (!response.isSuccessful) {
+                throw ApiError(response.code(), response.message())
+            }
+            val body = response.body() ?: throw ApiError(response.code(), response.message())
+            body.isSaveOnService = true
+            dao.insert(fromDto(body))
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {

@@ -75,6 +75,7 @@ class FeedFragment : Fragment() {
                 swiperefresh.isRefreshing = state.refreshing
                 if (state.error) {
                     Snackbar.make(root, "Error loading", Snackbar.LENGTH_LONG)
+                        .setAnchorView(binding.addNewPostButton)
                         .setAction(R.string.retry_loading) { viewModel.load() }
                         .show()
                 }
