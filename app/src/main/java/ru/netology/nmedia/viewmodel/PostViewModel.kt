@@ -27,9 +27,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository: PostRepository =
         PostRepositoryRetrofitImpl(AppDb.getInstance(context = application).postDao())
-    private val _data: MutableLiveData<FeedModel> = repository.data.map {
-        FeedModel(it, it.isEmpty())
-    } as MutableLiveData<FeedModel>
     val data: LiveData<FeedModel> = repository.data.map {
         FeedModel(it, it.isEmpty())
     }
@@ -80,18 +77,10 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 if (!post.likedByMe) {
                     repository.likeById(post.id)
-                    val updatePosts =
-                        _data.value?.posts?.map { if (it.id == post.id) post else it }.orEmpty()
-                    _data.value = FeedModel(posts = updatePosts, empty = updatePosts.isEmpty())
-                    _dataState.value = FeedModelState()
                 } else {
                     repository.dislikeById(post.id)
-                    val updatePosts =
-                        _data.value?.posts?.map { if (it.id == post.id) post else it }.orEmpty()
-
-                    _data.value = FeedModel(posts = updatePosts, empty = updatePosts.isEmpty())
-                    _dataState.value = FeedModelState()
                 }
+                _dataState.value = FeedModelState()
             } catch (e: Exception) {
                 _dataState.value = FeedModelState(error = true)
             }
@@ -102,9 +91,6 @@ class PostViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 repository.removeById(id)
-                _data.value = _data.value?.copy(posts = data.value?.posts.orEmpty()
-                    .filter { it.id != id }
-                )
                 _dataState.value = FeedModelState()
             } catch (e: Exception) {
                 _dataState.value = FeedModelState(error = true)

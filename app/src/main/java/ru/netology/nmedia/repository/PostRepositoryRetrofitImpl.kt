@@ -22,7 +22,7 @@ class PostRepositoryRetrofitImpl(private val dao: PostDao) : PostRepository {
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            body.map { it.isSaveOnService=true }
+            body.map { it.isSaveOnService = true }
             dao.insert(body.toEntity())
         } catch (e: IOException) {
             throw NetworkError
@@ -87,7 +87,7 @@ class PostRepositoryRetrofitImpl(private val dao: PostDao) : PostRepository {
     }
 
     override suspend fun save(post: Post) {
-//        dao.insert(fromDto(post))
+        dao.insert(fromDto(post.copy(author = "User", published = "Now", isSaveOnService = false)))
         try {
             val response = PostApiService.service.save(post)
             if (!response.isSuccessful) {
@@ -95,7 +95,9 @@ class PostRepositoryRetrofitImpl(private val dao: PostDao) : PostRepository {
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
             body.isSaveOnService = true
-            dao.insert(fromDto(body))
+            dao.updatePostId(body.id, post.id)
+            dao.updatePost(fromDto(body))
+//            dao.insert(fromDto(body))
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {

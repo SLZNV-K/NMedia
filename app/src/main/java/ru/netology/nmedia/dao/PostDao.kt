@@ -6,14 +6,23 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 
 @Dao
 interface PostDao {
     @Query("SELECT * FROM PostEntity ORDER BY id DESC")
     fun getAll(): LiveData<List<PostEntity>>
 
-//    @Upsert
-//    suspend fun save(post: PostEntity): Long
+    @Update
+    suspend fun updatePost(post: PostEntity)
+    @Query(
+        """
+           UPDATE PostEntity SET
+              id = :newId
+           WHERE id = :oldId;
+        """
+    )
+    suspend fun updatePostId(newId: Long, oldId: Long)
 
     @Query(
         """

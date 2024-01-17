@@ -1,8 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'org.jetbrains.kotlin.kapt'
     id 'com.google.gms.google-services'
+    id 'com.google.devtools.ksp'
 }
 
 android {
@@ -46,7 +46,7 @@ android {
 dependencies {
     def okhttp_version = "4.12.0"
     def glide_version = "4.14.2"
-    def lifecycle_version = "2.6.2"
+    def lifecycle_version = "2.7.0"
     def gson_version = "2.10.1"
     def material_version = "1.11.0"
     def appcompat_version = "1.6.1"
@@ -55,7 +55,8 @@ dependencies {
     def retrofit_gson_version = "2.9.0"
     def okhttp_logging_version = "4.12.0"
 
-    kapt "androidx.room:room-compiler:2.6.1"
+    ksp "androidx.room:room-compiler:2.6.1"
+    implementation 'com.google.devtools.ksp:symbol-processing-api:1.9.21-1.0.15'
     implementation "androidx.room:room-runtime:2.6.1"
     implementation "androidx.room:room-ktx:2.6.1"
     implementation "androidx.core:core-ktx:1.12.0"
