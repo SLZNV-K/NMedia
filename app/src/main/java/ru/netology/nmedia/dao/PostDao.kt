@@ -1,20 +1,26 @@
 package ru.netology.nmedia.dao
 
 import ru.netology.nmedia.entity.PostEntity
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PostDao {
-    @Query("SELECT * FROM PostEntity ORDER BY id DESC")
-    fun getAll(): LiveData<List<PostEntity>>
+    //    @Query("SELECT * FROM PostEntity ORDER BY id DESC")
+    @Query("SELECT * FROM PostEntity WHERE display = 1 ORDER BY id DESC")
+    fun getAll(): Flow<List<PostEntity>>
+
+
+    @Query("UPDATE PostEntity SET display = 1")
+    suspend fun updatePosts()
 
     @Update
     suspend fun updatePost(post: PostEntity)
+
     @Query(
         """
            UPDATE PostEntity SET
@@ -37,7 +43,7 @@ interface PostDao {
     @Query(
         """
            UPDATE PostEntity SET
-               shares = shares + 1,
+                shares = shares + 1,
                 sharedByMe = 1
            WHERE id = :id;
         """

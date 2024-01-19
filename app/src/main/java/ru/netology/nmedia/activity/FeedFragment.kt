@@ -88,6 +88,17 @@ class FeedFragment : Fragment() {
                 emptyText.isVisible = state.empty
             }
 
+            viewModel.newerCount.observe(viewLifecycleOwner) { count ->
+                if (count > 0) {
+                    getNewerPosts.visibility = View.VISIBLE
+                } else getNewerPosts.visibility = View.GONE
+
+                getNewerPosts.setOnClickListener {
+                    viewModel.getNewer(count.toLong())
+                    getNewerPosts.visibility = View.GONE
+                }
+            }
+
             swiperefresh.setOnRefreshListener {
                 viewModel.refreshPosts()
             }

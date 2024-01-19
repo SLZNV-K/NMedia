@@ -1,6 +1,11 @@
 package ru.netology.nmedia.repository
 
 import androidx.lifecycle.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import okio.IOException
 import ru.netology.nmedia.api.*
 import ru.netology.nmedia.dao.PostDao
@@ -15,6 +20,7 @@ import ru.netology.nmedia.error.UnknownError
 
 class PostRepositoryRetrofitImpl(private val dao: PostDao) : PostRepository {
     override val data = dao.getAll().map(List<PostEntity>::toDto)
+
     override suspend fun getAll() {
         try {
             val response = PostApiService.service.getAll()
@@ -22,7 +28,10 @@ class PostRepositoryRetrofitImpl(private val dao: PostDao) : PostRepository {
                 throw ApiError(response.code(), response.message())
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
-            body.map { it.isSaveOnService = true }
+            body.map {
+                it.isSaveOnService = true
+                it.display = true
+            }
             dao.insert(body.toEntity())
         } catch (e: IOException) {
             throw NetworkError
@@ -30,7 +39,32 @@ class PostRepositoryRetrofitImpl(private val dao: PostDao) : PostRepository {
             throw UnknownError
         }
     }
+    override fun getNewer(id: Long): Flow<Int> = flow {
+        while (true) {
+            delay(10_000L)
+            try {
+                val response = PostApiService.service.getNewer(id)
+                if (!response.isSuccessful) {
+                    throw ApiError(response.code(), response.message())
+                }
+                val body = response.body() ?: throw ApiError(response.code(), response.message())
+                body.map {
+                    it.isSaveOnService = true
+                    it.display = false
+                }
+                dao.insert(body.toEntity())
+                emit(body.size)
+            } catch (e: IOException) {
+                throw NetworkError
+            } catch (e: Exception) {
+                throw UnknownError
+            }
+        }
+    }.catch { it.printStackTrace() }
 
+    override suspend fun updatePosts(){
+        dao.updatePosts()
+    }
     override suspend fun likeById(id: Long) {
         dao.likeById(id)
         try {
@@ -67,11 +101,14 @@ class PostRepositoryRetrofitImpl(private val dao: PostDao) : PostRepository {
 
     override suspend fun shareById(id: Long) {
         dao.shareById(id)
-        data.value?.map {
-            if (it.id != id) it else it.copy(
-                sharedByMe = true,
-                shares = it.shares + 1
-            )
+
+        data.map { list ->
+            list.map {
+                if (it.id != id) it else it.copy(
+                    sharedByMe = true,
+                    shares = it.shares + 1
+                )
+            }
         }
     }
 
@@ -87,7 +124,7 @@ class PostRepositoryRetrofitImpl(private val dao: PostDao) : PostRepository {
     }
 
     override suspend fun save(post: Post) {
-        dao.insert(fromDto(post.copy(author = "User", published = "Now", isSaveOnService = false)))
+//        dao.insert(fromDto(post.copy(author = "User", published = "Now", isSaveOnService = false)))
         try {
             val response = PostApiService.service.save(post)
             if (!response.isSuccessful) {
@@ -95,9 +132,12 @@ class PostRepositoryRetrofitImpl(private val dao: PostDao) : PostRepository {
             }
             val body = response.body() ?: throw ApiError(response.code(), response.message())
             body.isSaveOnService = true
-            dao.updatePostId(body.id, post.id)
-            dao.updatePost(fromDto(body))
-//            dao.insert(fromDto(body))
+            body.display = true
+
+//            dao.updatePostId(body.id, post.id)
+//            dao.updatePost(fromDto(body))
+
+            dao.insert(fromDto(body))
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {

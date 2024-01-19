@@ -22,6 +22,19 @@
             tools:listitem="@layout/card_post" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/getNewerPosts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/common_spacing"
+        android:contentDescription="@string/the_button_for_showing_new_posts"
+        android:text="@string/new_entries"
+        app:icon="@drawable/arrow_upward"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone"/>
+
     <ProgressBar
         android:id="@+id/progress"
         android:layout_width="wrap_content"
@@ -51,5 +64,6 @@
         android:contentDescription="@string/description_add_post_button"
         android:src="@drawable/ic_add_24"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:ignore="RedundantDescriptionCheck" />
 </androidx.constraintlayout.widget.ConstraintLayout>

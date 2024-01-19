@@ -12,6 +12,7 @@ data class Post(
     val sharedByMe: Boolean = false,
     val views: Int = 0,
     var attachment: Attachment? = null,
-    var isSaveOnService: Boolean = false
+    var isSaveOnService: Boolean = false,
+    var display: Boolean = false
 )
 
