@@ -54,7 +54,20 @@
         android:layout_height="wrap_content"
         android:padding="@dimen/common_spacing"
         app:layout_constraintTop_toBottomOf="@id/barrier_top"
-        tools:text="@tools:sample/lorem[57]" />
+        tools:text="@tools:sample/lorem[57]"
+        android:importantForAutofill="no"
+        android:inputType="textMultiLine"/>
+
+    <ImageView
+        android:id="@+id/attachment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/editContent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/preview_of_photo"
+        tools:srcCompat="@drawable/img_video_preview" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/saveEditPost"

@@ -10,10 +10,11 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PostDao {
-    //    @Query("SELECT * FROM PostEntity ORDER BY id DESC")
     @Query("SELECT * FROM PostEntity WHERE display = 1 ORDER BY id DESC")
     fun getAll(): Flow<List<PostEntity>>
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertShadow(posts: List<PostEntity>)
 
     @Query("UPDATE PostEntity SET display = 1")
     suspend fun updatePosts()

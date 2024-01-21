@@ -25,7 +25,7 @@
     <string name="cancel_editing_text">Do you really want to undo the changes?</string>
     <string name="cancel_post_creation_text">Do you really want to cancel the creation of the post?</string>
     <string name="cancel_post_creation">Cancel the creation post</string>
-    <string name="yes">Да</string>
+    <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="new_post_hint">Here will be your post</string>
     <string name="channel_remote_name">Server notifications</string>
@@ -40,4 +40,14 @@
     <string name="the_sign_of_sending_a_post_to_the_server">The sign of sending a post to the server</string>
     <string name="the_button_for_showing_new_posts">The button for showing new posts</string>
     <string name="new_entries">New entries</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="preview_of_photo">Preview of photo</string>
+    <string name="make_the_photo">Make the photo</string>
+    <string name="choose_the_photo">Choose the photo</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+    <string name="make_the_comment">Make the comment</string>
+    <string name="full_screen_photo">Full-screen photo</string>
+    <string name="description_the_back_button">The back button</string>
 </resources>

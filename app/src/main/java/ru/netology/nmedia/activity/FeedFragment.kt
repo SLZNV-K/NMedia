@@ -11,7 +11,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
-import ru.netology.nmedia.activity.EditPostFragment.Companion.textArg
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
@@ -54,7 +53,11 @@ class FeedFragment : Fragment() {
                 findNavController()
                     .navigate(
                         R.id.action_feedFragment_to_editPostFragment,
-                        Bundle().apply { textArg = post.content })
+                        Bundle().apply {
+                            putString("EXTRA_CONTENT", post.content)
+                            putLong("EXTRA_ID", post.id)
+                        }
+                    )
                 viewModel.edit(post)
             }
 
@@ -62,7 +65,15 @@ class FeedFragment : Fragment() {
                 findNavController()
                     .navigate(
                         R.id.action_feedFragment_to_postDetailsFragment,
-                        Bundle().apply { textArg = post.id.toString() })
+                        Bundle().apply { putLong("EXTRA_ID", post.id) })
+            }
+
+            override fun onPhoto(post: Post) {
+                if (post.attachment == null) return
+                findNavController()
+                    .navigate(
+                        R.id.action_feedFragment_to_photoFragment,
+                        Bundle().apply { putString("EXTRA_URI", post.attachment?.url) })
             }
         }
         )

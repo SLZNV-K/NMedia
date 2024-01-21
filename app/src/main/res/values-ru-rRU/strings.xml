@@ -40,4 +40,12 @@
     <string name="the_sign_of_sending_a_post_to_the_server">признак отправки сообщения на сервер</string>
     <string name="the_button_for_showing_new_posts">Кнопка показа новых постов</string>
     <string name="new_entries">Новые записи</string>
+    <string name="save">Сохранить</string>
+    <string name="cancel">Отменить</string>
+    <string name="preview_of_photo">Показ выбранной фотографии</string>
+    <string name="make_the_photo">Сделать фото</string>
+    <string name="choose_the_photo">Выбрать фото</string>
+    <string name="make_the_comment">Оставить комментарий</string>
+    <string name="full_screen_photo">Фото на весь экран</string>
+    <string name="description_the_back_button">Кнопка назад</string>
 </resources>
