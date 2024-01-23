@@ -48,4 +48,7 @@
     <string name="make_the_comment">Оставить комментарий</string>
     <string name="full_screen_photo">Фото на весь экран</string>
     <string name="description_the_back_button">Кнопка назад</string>
+    <string name="sign_in">Войти</string>
+    <string name="sign_up">Зарегистрироваться</string>
+    <string name="sign_out">Выйти</string>
 </resources>

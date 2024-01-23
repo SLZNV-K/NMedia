@@ -20,6 +20,7 @@ import ru.netology.nmedia.viewmodel.PostViewModel
 
 class FeedFragment : Fragment() {
 
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -75,8 +76,8 @@ class FeedFragment : Fragment() {
                         R.id.action_feedFragment_to_photoFragment,
                         Bundle().apply { putString("EXTRA_URI", post.attachment?.url) })
             }
-        }
-        )
+        })
+
         with(binding) {
 
             list.adapter = adapter

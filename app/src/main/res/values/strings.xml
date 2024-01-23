@@ -50,4 +50,7 @@
     <string name="make_the_comment">Make the comment</string>
     <string name="full_screen_photo">Full-screen photo</string>
     <string name="description_the_back_button">The back button</string>
+    <string name="sign_in">Sign In</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_out">Sign Out</string>
 </resources>
