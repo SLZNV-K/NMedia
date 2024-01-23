@@ -1,18 +1,17 @@
 package ru.netology.nmedia.repository
 
+import kotlinx.coroutines.flow.Flow
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.model.PhotoModel
 
 interface PostRepository {
-    fun getAllAsync(callBack: GetAllCallBack<List<Post>>)
-    fun likeById(id: Long, callBack: GetAllCallBack<Post>)
-    fun dislikeById(id: Long, callBack: GetAllCallBack<Post>)
-    fun shareById(id: Long)
-    fun removeById(id: Long, callBack: GetAllCallBack<Unit>)
-    fun save(post: Post, callBack: GetAllCallBack<Post>)
-
-    interface GetAllCallBack<T> {
-        fun onSuccess(data: T)
-        fun onError(e: Exception)
-    }
-
+    val data: Flow<List<Post>>
+    fun getNewer(id: Long): Flow<Int>
+    suspend fun updatePosts()
+    suspend fun getAll()
+    suspend fun likeById(id: Long)
+    suspend fun dislikeById(id: Long)
+    suspend fun shareById(id: Long)
+    suspend fun removeById(id: Long)
+    suspend fun save(post: Post, photo: PhotoModel?)
 }

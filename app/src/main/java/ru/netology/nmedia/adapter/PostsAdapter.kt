@@ -18,6 +18,7 @@ interface OnInteractionListener {
     fun onRemove(post: Post)
     fun onEdit(post: Post)
     fun onPost(post: Post)
+    fun onPhoto(post: Post)
 }
 
 
@@ -54,9 +55,13 @@ class PostsViewHolder(
             viewingCount.text = reformatCount(post.views)
             attachment.visibility = View.GONE
 
-            if (post.attachment != null){
+            if (post.isSaveOnService) {
+                savedOnServer.setImageResource(R.drawable.done_service)
+            } else savedOnServer.setImageResource(R.drawable.done_db_24)
+
+            if (post.attachment != null) {
                 attachment.visibility = View.VISIBLE
-                attachment.load("${BASE_URL}/images/${post.attachment!!.url}")
+                attachment.load("${BASE_URL}/media/${post.attachment!!.url}")
             }
 
             like.setOnClickListener {
@@ -64,6 +69,9 @@ class PostsViewHolder(
             }
             share.setOnClickListener {
                 onInteractionListener.onShare(post)
+            }
+            attachment.setOnClickListener {
+                onInteractionListener.onPhoto(post)
             }
             menu.setOnClickListener {
                 PopupMenu(it.context, it).apply {

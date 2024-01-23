@@ -1,33 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/newContent"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="top"
-        android:padding="@dimen/common_spacing"
-        android:inputType="text"
-        android:hint="@string/new_post_hint"
-        android:importantForAutofill="no"/>
+        android:layout_height="wrap_content">
 
-    <com.google.android.material.bottomappbar.BottomAppBar
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="?actionBarSize">
+
+            <EditText
+                android:id="@+id/newContent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="start|top"
+                android:hint="@string/new_post_hint"
+                android:inputType="textMultiLine"
+                android:padding="@dimen/common_spacing"
+                android:autofillHints="no" />
+
+            <FrameLayout
+                android:id="@+id/preview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/previewPhoto"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:adjustViewBounds="true"
+                    android:contentDescription="@string/preview_of_photo"
+                    tools:srcCompat="@drawable/img_video_preview" />
+
+                <Button
+                    android:id="@+id/clearButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center"
+                    android:contentDescription="@string/cancel_button"
+                    android:text="@string/cancel" />
+
+            </FrameLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
         android:id="@+id/bottomAppBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        app:fabAlignmentMode="center"/>
+        android:background="?colorPrimary"
+        android:orientation="horizontal"
+        app:fabAlignmentMode="center">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/saveNewPost"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="@string/description_save_new_post_button"
-        android:src="@drawable/check_24"
-        app:layout_anchor="@id/bottomAppBar"/>
+        <Button
+            android:id="@+id/take_Photo_button"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/make_the_photo"
+            app:icon="@drawable/photo_camera"
+            app:iconTint="?colorOnPrimary" />
+
+        <Button
+            android:id="@+id/gallery_button"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/choose_the_photo"
+            app:icon="@drawable/gallery"
+            app:iconTint="?colorOnPrimary" />
+
+
+    </LinearLayout>
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

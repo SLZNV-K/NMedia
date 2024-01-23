@@ -5,13 +5,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
 import ru.netology.nmedia.R
-import ru.netology.nmedia.activity.EditPostFragment.Companion.textArg
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
@@ -54,7 +53,11 @@ class FeedFragment : Fragment() {
                 findNavController()
                     .navigate(
                         R.id.action_feedFragment_to_editPostFragment,
-                        Bundle().apply { textArg = post.content })
+                        Bundle().apply {
+                            putString("EXTRA_CONTENT", post.content)
+                            putLong("EXTRA_ID", post.id)
+                        }
+                    )
                 viewModel.edit(post)
             }
 
@@ -62,33 +65,53 @@ class FeedFragment : Fragment() {
                 findNavController()
                     .navigate(
                         R.id.action_feedFragment_to_postDetailsFragment,
-                        Bundle().apply { textArg = post.id.toString() })
+                        Bundle().apply { putLong("EXTRA_ID", post.id) })
+            }
+
+            override fun onPhoto(post: Post) {
+                if (post.attachment == null) return
+                findNavController()
+                    .navigate(
+                        R.id.action_feedFragment_to_photoFragment,
+                        Bundle().apply { putString("EXTRA_URI", post.attachment?.url) })
             }
         }
         )
         with(binding) {
 
             list.adapter = adapter
-            viewModel.data.observe(viewLifecycleOwner) { state ->
-                if(state.actionError){
-                    Toast.makeText(
-                        context,
-                        "Something went wrong",
-                        Toast.LENGTH_LONG
-                    ).show()
-                } else {
-                    adapter.submitList(state.posts)
-                    progress.isVisible = state.loading
-                    errorGroup.isVisible = state.error
-                    emptyText.isVisible = state.empty
+
+            viewModel.dataState.observe(viewLifecycleOwner) { state ->
+                progress.isVisible = state.loading
+                swiperefresh.isRefreshing = state.refreshing
+                if (state.error) {
+                    Snackbar.make(root, "Error loading", Snackbar.LENGTH_LONG)
+                        .setAnchorView(binding.addNewPostButton)
+                        .setAction(R.string.retry_loading) { viewModel.load() }
+                        .show()
                 }
             }
-            retryButton.setOnClickListener {
-                viewModel.load()
+            viewModel.data.observe(viewLifecycleOwner) { state ->
+                val isNewPost = state.posts.size > adapter.currentList.size && adapter.itemCount > 0
+                adapter.submitList(state.posts) {
+                    if (isNewPost) list.smoothScrollToPosition(0)
+                }
+                emptyText.isVisible = state.empty
             }
+
+            viewModel.newerCount.observe(viewLifecycleOwner) { count ->
+                if (count > 0) {
+                    getNewerPosts.visibility = View.VISIBLE
+                } else getNewerPosts.visibility = View.GONE
+
+                getNewerPosts.setOnClickListener {
+                    viewModel.getNewer(count.toLong())
+                    getNewerPosts.visibility = View.GONE
+                }
+            }
+
             swiperefresh.setOnRefreshListener {
-                viewModel.load()
-                swiperefresh.isRefreshing = false
+                viewModel.refreshPosts()
             }
 
             addNewPostButton.setOnClickListener {

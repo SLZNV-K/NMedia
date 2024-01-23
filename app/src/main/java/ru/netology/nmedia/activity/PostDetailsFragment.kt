@@ -10,8 +10,8 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import ru.netology.nmedia.BuildConfig.BASE_URL
 import ru.netology.nmedia.R
-import ru.netology.nmedia.activity.EditPostFragment.Companion.textArg
 import ru.netology.nmedia.adapter.reformatCount
 import ru.netology.nmedia.databinding.FragmentPostDetailsBinding
 import ru.netology.nmedia.util.load
@@ -25,11 +25,10 @@ class PostDetailsFragment : Fragment() {
     ): View {
         val binding = FragmentPostDetailsBinding.inflate(layoutInflater, container, false)
         val viewModel: PostViewModel by activityViewModels()
-        val id = arguments?.textArg.orEmpty().toLong()
+        val id = arguments?.getLong("EXTRA_ID")
 
-        viewModel.data.observe(viewLifecycleOwner) { state ->
-            val post = state.posts.find { it.id == id }
-            if (state.actionError) {
+        viewModel.dataState.observe(viewLifecycleOwner) {
+            if (it.error) {
                 Toast.makeText(
                     context,
                     "Something went wrong",
@@ -37,11 +36,13 @@ class PostDetailsFragment : Fragment() {
                 ).show()
                 return@observe
             }
+        }
+        viewModel.data.observe(viewLifecycleOwner) { state ->
+            val post = state.posts.find { it.id == id }
             if (post == null) {
                 findNavController().navigateUp()
                 return@observe
             }
-            val BASE_URL = "http://10.0.2.2:9999"
             with(binding) {
                 author.text = post.author
                 published.text = post.published
@@ -55,7 +56,13 @@ class PostDetailsFragment : Fragment() {
 
                 if (post.attachment != null) {
                     attachment.visibility = View.VISIBLE
-                    attachment.load("${BASE_URL}/images/${post.attachment!!.url}")
+                    attachment.load("${BASE_URL}/media/${post.attachment!!.url}")
+                }
+
+                attachment.setOnClickListener {
+                    findNavController()
+                        .navigate(R.id.action_postDetailsFragment_to_photoFragment,
+                            Bundle().apply { putString("EXTRA_URI", post.attachment?.url) })
                 }
 
                 like.setOnClickListener {
@@ -80,7 +87,11 @@ class PostDetailsFragment : Fragment() {
                                     findNavController()
                                         .navigate(
                                             R.id.action_postDetailsFragment_to_editPostFragment,
-                                            Bundle().apply { textArg = post.content })
+                                            Bundle().apply {
+                                                putString("EXTRA_CONTENT", post.content)
+                                                putLong("EXTRA_ID", post.id)
+                                            }
+                                        )
                                     viewModel.edit(post)
                                     true
                                 }

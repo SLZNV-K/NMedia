@@ -1,17 +1,20 @@
 package ru.netology.nmedia.api
 
 import com.google.firebase.BuildConfig
+import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Call
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
+import ru.netology.nmedia.dto.Media
 import ru.netology.nmedia.dto.Post
 import java.util.concurrent.TimeUnit
 
@@ -32,25 +35,32 @@ private val retrofit = Retrofit.Builder()
     .addConverterFactory(GsonConverterFactory.create())
     .build()
 
-interface PostApi {
+interface PostApiService {
     @GET("posts")
-    fun getAll(): Call<List<Post>>
+    suspend fun getAll(): Response<List<Post>>
+
+    @GET("posts/{id}/newer")
+    suspend fun getNewer(@Path("id") id: Long): Response<List<Post>>
 
     @POST("posts")
-    fun save(@Body post: Post): Call<Post>
+    suspend fun save(@Body post: Post): Response<Post>
 
     @DELETE("posts/{id}")
-    fun delete(@Path("id") id: Long): Call<Unit>
+    suspend fun delete(@Path("id") id: Long)
 
     @POST("posts/{id}/likes")
-    fun like(@Path("id") id: Long): Call<Post>
+    suspend fun like(@Path("id") id: Long): Response<Post>
 
     @DELETE("posts/{id}/likes")
-    fun dislike(@Path("id") id: Long): Call<Post>
+    suspend fun dislike(@Path("id") id: Long): Response<Post>
+
+    @Multipart
+    @POST("media")
+    suspend fun upload(@Part file: MultipartBody.Part): Media
 }
 
-object PostApiService {
-    val service: PostApi by lazy {
-        retrofit.create()
+object PostApi {
+    val service: PostApiService by lazy {
+        retrofit.create(PostApiService::class.java)
     }
 }
