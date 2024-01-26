@@ -5,31 +5,75 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.MenuProvider
+import androidx.navigation.findNavController
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import ru.netology.nmedia.R
-import ru.netology.nmedia.databinding.ActivityAppBinding
+import ru.netology.nmedia.auth.AppAuth
+import ru.netology.nmedia.viewmodel.AuthViewModel
 
 
-class AppActivity : AppCompatActivity() {
+class AppActivity : AppCompatActivity(R.layout.activity_app) {
+
+    val viewModel by viewModels<AuthViewModel>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         requestNotificationsPermission()
 
-        val binding = ActivityAppBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        intent?.let {
+            if (it.action != Intent.ACTION_SEND) {
+                return@let
+            }
 
-        if (intent.action != Intent.ACTION_SEND) return
-
-        val text = intent.getStringExtra(Intent.EXTRA_TEXT)
-        if (text.isNullOrBlank()) {
-            Toast.makeText(this, R.string.empty_text_error, Toast.LENGTH_SHORT).show()
-            return
-
+            val text = it.getStringExtra(Intent.EXTRA_TEXT)
+            if (text?.isNotBlank() != true) {
+                Toast.makeText(this, R.string.empty_text_error, Toast.LENGTH_SHORT).show()
+                return@let
+            }
         }
+
+        addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_main, menu)
+            }
+
+            override fun onPrepareMenu(menu: Menu) {
+                menu.let {
+                    it.setGroupVisible(R.id.unauthenticated, !viewModel.authenticated)
+                    it.setGroupVisible(R.id.authenticated, viewModel.authenticated)
+                }
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean =
+                when (menuItem.itemId) {
+                    R.id.signIn -> {
+                        findNavController(R.id.nav_host_fragment).navigate(R.id.signInFragment)
+                        true
+                    }
+
+                    R.id.signUp -> {
+                        // TODO: just hardcode it, implementation must be in homework
+                        AppAuth.getInstance().setAuth(5, "x-token")
+                        true
+                    }
+
+                    R.id.signOut -> {
+                        // TODO: just hardcode it, implementation must be in homework
+                        AppAuth.getInstance().removeAuth()
+                        true
+                    }
+
+                    else -> false
+                }
+        })
         checkGoogleApiAvailability()
     }
 

@@ -60,4 +60,9 @@
         android:id="@+id/photoFragment"
         android:name="ru.netology.nmedia.activity.PhotoFragment"
         android:label="PhotoFragment" />
+    <fragment
+        android:id="@+id/signInFragment"
+        android:name="ru.netology.nmedia.activity.SignInFragment"
+        android:label="fragment_sign_in"
+        tools:layout="@layout/fragment_sign_in" />
 </navigation>
