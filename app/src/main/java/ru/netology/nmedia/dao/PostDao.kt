@@ -13,6 +13,9 @@ interface PostDao {
     @Query("SELECT * FROM PostEntity WHERE display = 1 ORDER BY id DESC")
     fun getAll(): Flow<List<PostEntity>>
 
+    @Query("SELECT MAX(id) FROM PostEntity")
+    suspend fun getLastId(): Long
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertShadow(posts: List<PostEntity>)
 

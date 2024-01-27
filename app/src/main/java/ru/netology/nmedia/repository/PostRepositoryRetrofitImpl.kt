@@ -133,7 +133,16 @@ class PostRepositoryRetrofitImpl(private val dao: PostDao) : PostRepository {
     }
 
     override suspend fun save(post: Post, photo: PhotoModel?) {
-//        dao.insert(fromDto(post.copy(author = "User", published = "Now", isSaveOnService = false)))
+        dao.insert(
+            fromDto(
+                post.copy(
+                    author = "User",
+                    published = "Now",
+                    isSaveOnService = false,
+                    display = true
+                )
+            )
+        )
         try {
             val postWithAttachment = if (photo?.file != null) {
                 val media = upload(photo.file)
@@ -149,10 +158,11 @@ class PostRepositoryRetrofitImpl(private val dao: PostDao) : PostRepository {
             body.isSaveOnService = true
             body.display = true
 
-//            dao.updatePostId(body.id, post.id)
-//            dao.updatePost(fromDto(body))
+//            println("Last id in dao: " + dao.getLastId())
+//            println("id server: " + body.id)
+            dao.updatePostId(body.id, dao.getLastId())
+            dao.updatePost(fromDto(body))
 
-            dao.insert(fromDto(body))
         } catch (e: IOException) {
             throw NetworkError
         } catch (e: Exception) {
