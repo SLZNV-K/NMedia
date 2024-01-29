@@ -12,9 +12,9 @@ import ru.netology.nmedia.model.AuthModelState
 import java.io.IOException
 
 class SignInViewModel : ViewModel() {
-    private val _authState = MutableLiveData(AuthModelState())
-    val authState: LiveData<AuthModelState>
-        get() = _authState
+    private val _authStateModel = MutableLiveData(AuthModelState())
+    val authStateModel: LiveData<AuthModelState>
+        get() = _authStateModel
 
     fun updateUser(login: String, pass: String) {
         viewModelScope.launch {
@@ -25,11 +25,11 @@ class SignInViewModel : ViewModel() {
                     throw ApiError(response.code(), response.message())
                 }
                 val body = response.body() ?: throw ApiError(response.code(), response.message())
-                AppAuth.getInstance().setAuth(body.id, body.token)
+                AppAuth.getInstance().setAuth(body.id, body.token!!)
             } catch (e: IOException) {
-                _authState.value = AuthModelState(error = true)
+                _authStateModel.value = AuthModelState(error = true)
             } catch (e: Exception) {
-                _authState.value = AuthModelState(error = true)
+                _authStateModel.value = AuthModelState(error = true)
             }
         }
     }

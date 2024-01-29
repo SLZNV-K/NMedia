@@ -19,14 +19,21 @@ class SignInFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         val binding = FragmentSignInBinding.inflate(layoutInflater)
-
         val viewModel by activityViewModels<SignInViewModel>()
 
         with(binding) {
             val login = login.text
             val password = password.text
+
+//            viewModel.authStateModel.observe(viewLifecycleOwner) { state ->
+//                if (state.error) {
+//                    groupSuccess.visibility = View.GONE
+//                    groupError.visibility = View.VISIBLE
+//                } else {
+//                    findNavController().navigateUp()
+//                }
+//            }
             signInButton.setOnClickListener {
                 if (login.isBlank() || password.isBlank()) {
                     Toast.makeText(
@@ -35,16 +42,18 @@ class SignInFragment : Fragment() {
                         Toast.LENGTH_SHORT
                     )
                         .show()
-                }
-                viewModel.authState.observe(viewLifecycleOwner) { state ->
+                } else {
                     viewModel.updateUser(login.toString(), password.toString())
-                    if (state.error) {
-                        groupSuccess.visibility = View.GONE
-                        groupError.visibility = View.VISIBLE
-                    } else {
-                        findNavController().navigateUp()
-                    }
+                    val previousFragment =
+                        findNavController().previousBackStackEntry?.destination?.id
+                    if (previousFragment == R.id.signUpFragment) {
+                        findNavController().navigate(R.id.feedFragment)
+                    } else findNavController().navigateUp()
                 }
+            }
+
+            signUpButton.setOnClickListener {
+                findNavController().navigate(R.id.signUpFragment)
             }
         }
         return binding.root

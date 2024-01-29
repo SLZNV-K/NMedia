@@ -64,10 +64,10 @@ class NewPostFragment : Fragment() {
 
         viewModel.photo.observe(viewLifecycleOwner) {
             if (it == null) {
-                binding.preview.visibility = View.GONE
+                binding.previewGroup.visibility = View.GONE
                 return@observe
             }
-            binding.preview.visibility = View.VISIBLE
+            binding.previewGroup.visibility = View.VISIBLE
             binding.previewPhoto.setImageURI(it.uri)
         }
 
@@ -102,7 +102,7 @@ class NewPostFragment : Fragment() {
                         if (!binding.newContent.text.isNullOrBlank()) {
                             viewModel.changeContent(binding.newContent.text.toString())
                             viewModel.save()
-                            binding.preview.visibility = View.GONE
+                            binding.previewGroup.visibility = View.GONE
                             AndroidUtils.hideKeyboard(requireView())
                             editor?.clear()
                             editor?.apply()

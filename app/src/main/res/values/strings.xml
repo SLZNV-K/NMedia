@@ -20,7 +20,6 @@
     <string name="description_video_preview">Video preview</string>
     <string name="edit_message">Edit message</string>
     <string name="description_play_button">Play button</string>
-    <string name="video_title_stub" translatable="false">Весна – открытый фильм Blender</string>
     <string name="cancel_editing">Cancel editing</string>
     <string name="cancel_editing_text">Do you really want to undo the changes?</string>
     <string name="cancel_post_creation_text">Do you really want to cancel the creation of the post?</string>
@@ -60,4 +59,12 @@
     <string name="sign_up_to_nmedia">Sign up to NMedia</string>
     <string name="name">Name</string>
     <string name="password_confirmation">Password Confirmation</string>
+    <string name="to_interact_with_posts_you_need_to_log_in">To interact with posts, you need to log in</string>
+    <string name="passwords_don_t_match">Passwords don\'t match</string>
+    <string name="are_you_sure">Are you sure?</string>
+    <string name="if_you_exit_now_progress_will_be_lost">If you exit now, progress will be lost</string>
+    <string name="get_out_anyway">Get out anyway</string>
+    <string name="don_t_have_an_account_yet">Don\'t have an account yet?</string>
+    <string name="fields_cannot_be_empty">Fields cannot be empty</string>
+    <string name="already_have_an_account">Already have an account?</string>
 </resources>

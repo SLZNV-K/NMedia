@@ -1,5 +1,6 @@
 package ru.netology.nmedia.activity
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,6 +16,7 @@ import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.reformatCount
 import ru.netology.nmedia.databinding.FragmentPostDetailsBinding
 import ru.netology.nmedia.util.load
+import ru.netology.nmedia.viewmodel.AuthViewModel
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 class PostDetailsFragment : Fragment() {
@@ -25,6 +27,7 @@ class PostDetailsFragment : Fragment() {
     ): View {
         val binding = FragmentPostDetailsBinding.inflate(layoutInflater, container, false)
         val viewModel: PostViewModel by activityViewModels()
+        val viewModelAuth: AuthViewModel by activityViewModels()
         val id = arguments?.getLong("EXTRA_ID")
 
         viewModel.dataState.observe(viewLifecycleOwner) {
@@ -66,7 +69,19 @@ class PostDetailsFragment : Fragment() {
                 }
 
                 like.setOnClickListener {
-                    viewModel.likeById(post)
+                    if (viewModelAuth.authenticated) {
+                        viewModel.likeById(post)
+                    } else {
+                        AlertDialog.Builder(requireActivity()).apply {
+                            setTitle(getString(R.string.sign_in))
+                            setMessage(getString(R.string.to_interact_with_posts_you_need_to_log_in))
+                            setPositiveButton(getString(R.string.sign_in)) { _, _ ->
+                                findNavController().navigate(R.id.signInFragment)
+                            }
+                            setNegativeButton(getString(R.string.cancel)) { _, _ -> }
+                            setCancelable(true)
+                        }.create().show()
+                    }
                 }
                 share.setOnClickListener {
                     viewModel.shareById(post.id)

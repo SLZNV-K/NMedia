@@ -15,7 +15,7 @@
         android:layout_margin="@dimen/common_spacing"
         android:fontFamily="sans-serif-medium"
         android:text="@string/sign_in_to_nmedia"
-        android:textColor="@color/design_default_color_primary"
+        android:textColor="?attr/colorPrimary"
         android:textSize="36sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -78,10 +78,10 @@
         android:id="@+id/login_hint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/login_error"
         android:text="@string/invalid_login"
         android:textColor="@color/red"
-        app:layout_constraintEnd_toEndOf="@id/login_error"/>
+        app:layout_constraintEnd_toEndOf="@id/login_error"
+        app:layout_constraintTop_toBottomOf="@id/login_error" />
 
     <EditText
         android:id="@+id/password_error"
@@ -99,10 +99,10 @@
         android:id="@+id/password_hint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/password_error"
         android:text="@string/invalid_password"
         android:textColor="@color/red"
-        app:layout_constraintEnd_toEndOf="@id/password_error"/>
+        app:layout_constraintEnd_toEndOf="@id/password_error"
+        app:layout_constraintTop_toBottomOf="@id/password_error" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/signInButton"
@@ -114,4 +114,29 @@
         android:textSize="16sp"
         app:layout_constraintTop_toBottomOf="@id/password"
         tools:ignore="VisualLintButtonSize" />
+
+    <TextView
+        android:id="@+id/noAccount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:gravity="center"
+        android:text="@string/don_t_have_an_account_yet"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/signInButton" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/signUpButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/sign_up"
+        android:textColor="?attr/colorOnBackground"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/noAccount"
+        tools:ignore="VisualLintButtonSize"
+        android:backgroundTint="@android:color/transparent"
+        app:strokeColor="?attr/colorPrimary"
+        app:strokeWidth="2dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
