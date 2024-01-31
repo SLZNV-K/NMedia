@@ -16,6 +16,8 @@ import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import ru.netology.nmedia.R
 import ru.netology.nmedia.activity.AppActivity
+import ru.netology.nmedia.auth.AppAuth
+import ru.netology.nmedia.dto.PushContent
 import kotlin.random.Random
 
 class FSMService : FirebaseMessagingService() {
@@ -37,29 +39,25 @@ class FSMService : FirebaseMessagingService() {
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
+        val intent = Intent(this, AppActivity::class.java)
+        val pi = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
-        message.data["action"]?.let {
-            when (Actions.getValueOf(it)) {
-                Actions.LIKE -> handleLike(
-                    Gson().fromJson(
-                        message.data["content"],
-                        Like::class.java
-                    )
-                )
+        val ourId = AppAuth.getInstance().authState.value.id
+        val pushContent = Gson().fromJson(message.data["content"], PushContent::class.java)
 
-                Actions.POST -> handlePost(
-                    Gson().fromJson(
-                        message.data["content"],
-                        Post::class.java
-                    )
-                )
+        if (pushContent.recipientId == ourId || pushContent.recipientId == null) {
+            val notification = NotificationCompat.Builder(this, channelId)
+                .setSmallIcon(R.drawable.ic_notification)
+                .setContentText(pushContent.content)
+                .setContentIntent(pi)
+                .setAutoCancel(true)
+                .build()
 
-                Actions.ERROR -> println("The application cannot accept this push")
-//                    Toast.makeText(this, "The application cannot accept this push", Toast.LENGTH_LONG).show()
-
-            }
+            notify(notification)
+        } else {
+            AppAuth.getInstance().sendPushToken()
         }
-        println(Gson().toJson(message))
+        println(message)
     }
 
 
@@ -115,7 +113,7 @@ class FSMService : FirebaseMessagingService() {
     }
 
     override fun onNewToken(token: String) {
-        println(token)
+        AppAuth.getInstance().sendPushToken(token)
     }
 }
 
