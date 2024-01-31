@@ -1,7 +1,5 @@
 package ru.netology.nmedia.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
@@ -9,12 +7,13 @@ import ru.netology.nmedia.api.PostApi
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.error.ApiError
 import ru.netology.nmedia.model.AuthModelState
+import ru.netology.nmedia.util.SingleLiveEvent
 import java.io.IOException
 
 class SignInViewModel : ViewModel() {
-    private val _authState = MutableLiveData(AuthModelState())
-    val authState: LiveData<AuthModelState>
-        get() = _authState
+    private val _authStateModel = SingleLiveEvent<AuthModelState>()
+    val authStateModel: SingleLiveEvent<AuthModelState>
+        get() = _authStateModel
 
     fun updateUser(login: String, pass: String) {
         viewModelScope.launch {
@@ -25,11 +24,12 @@ class SignInViewModel : ViewModel() {
                     throw ApiError(response.code(), response.message())
                 }
                 val body = response.body() ?: throw ApiError(response.code(), response.message())
-                AppAuth.getInstance().setAuth(body.id, body.token)
+                AppAuth.getInstance().setAuth(body.id, body.token!!)
+                _authStateModel.value = AuthModelState()
             } catch (e: IOException) {
-                _authState.value = AuthModelState(error = true)
+                _authStateModel.value = AuthModelState(error = true)
             } catch (e: Exception) {
-                _authState.value = AuthModelState(error = true)
+                _authStateModel.value = AuthModelState(error = true)
             }
         }
     }

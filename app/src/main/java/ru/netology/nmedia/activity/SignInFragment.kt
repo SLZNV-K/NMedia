@@ -14,37 +14,45 @@ import ru.netology.nmedia.viewmodel.SignInViewModel
 
 
 class SignInFragment : Fragment() {
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         val binding = FragmentSignInBinding.inflate(layoutInflater)
-
-        val viewModel by activityViewModels<SignInViewModel>()
+        val viewModel: SignInViewModel by activityViewModels()
 
         with(binding) {
-            val login = login.text
-            val password = password.text
+            val log = login.text
+            val pass = password.text
+
+            viewModel.authStateModel.observe(viewLifecycleOwner) { state ->
+                if (state!!.error) {
+                    login.error = getString(R.string.invalid_login)
+                    password.error = getString(R.string.invalid_password)
+                } else {
+                    val previousFragment =
+                        findNavController().previousBackStackEntry?.destination?.id
+                    if (previousFragment == R.id.signUpFragment) {
+                        findNavController().navigate(R.id.feedFragment)
+                    } else findNavController().navigateUp()
+                }
+            }
+
             signInButton.setOnClickListener {
-                if (login.isBlank() || password.isBlank()) {
+                if (log.isBlank() || pass.isBlank()) {
                     Toast.makeText(
                         requireActivity(),
                         R.string.empty_text_error,
                         Toast.LENGTH_SHORT
                     )
                         .show()
+                } else {
+                    viewModel.updateUser(log.toString(), pass.toString())
                 }
-                viewModel.authState.observe(viewLifecycleOwner) { state ->
-                    viewModel.updateUser(login.toString(), password.toString())
-                    if (state.error) {
-                        groupSuccess.visibility = View.GONE
-                        groupError.visibility = View.VISIBLE
-                    } else {
-                        findNavController().navigateUp()
-                    }
-                }
+            }
+
+            signUpButton.setOnClickListener {
+                findNavController().navigate(R.id.signUpFragment)
             }
         }
         return binding.root

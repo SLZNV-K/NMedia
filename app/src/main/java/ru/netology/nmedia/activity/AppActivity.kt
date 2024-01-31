@@ -1,6 +1,7 @@
 package ru.netology.nmedia.activity
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -60,17 +61,28 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
                     }
 
                     R.id.signUp -> {
-                        // TODO: just hardcode it, implementation must be in homework
-                        AppAuth.getInstance().setAuth(5, "x-token")
+                        findNavController(R.id.nav_host_fragment).navigate(R.id.signUpFragment)
                         true
                     }
 
                     R.id.signOut -> {
-                        // TODO: just hardcode it, implementation must be in homework
-                        AppAuth.getInstance().removeAuth()
+                        if (findNavController(R.id.nav_host_fragment).currentDestination?.id == R.id.newPostFragment) {
+                            AlertDialog.Builder(this@AppActivity).apply {
+                                setTitle(getString(R.string.are_you_sure))
+                                setMessage(getString(R.string.if_you_exit_now_progress_will_be_lost))
+                                setPositiveButton(getString(R.string.get_out_anyway)) { _, _ ->
+                                    AppAuth.getInstance().removeAuth()
+                                    findNavController(R.id.nav_host_fragment).navigateUp()
+                                }
+                                setNegativeButton(getString(R.string.cancel)) { _, _ ->
+                                }
+                                setCancelable(true)
+                            }.create().show()
+                        } else {
+                            AppAuth.getInstance().removeAuth()
+                        }
                         true
                     }
-
                     else -> false
                 }
         })
@@ -81,13 +93,11 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             return
         }
-
         val permission = Manifest.permission.POST_NOTIFICATIONS
 
         if (checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED) {
             return
         }
-
         requestPermissions(arrayOf(permission), 1)
     }
 

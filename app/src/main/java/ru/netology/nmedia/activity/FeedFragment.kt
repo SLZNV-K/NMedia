@@ -1,5 +1,6 @@
 package ru.netology.nmedia.activity
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,6 +16,7 @@ import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
 import ru.netology.nmedia.databinding.FragmentFeedBinding
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.viewmodel.AuthViewModel
 import ru.netology.nmedia.viewmodel.PostViewModel
 
 
@@ -28,15 +30,28 @@ class FeedFragment : Fragment() {
     ): View {
         val binding = FragmentFeedBinding.inflate(layoutInflater, container, false)
 
-        val viewModel: PostViewModel by activityViewModels()
+        val viewModelPost: PostViewModel by activityViewModels()
+        val viewModelAuth: AuthViewModel by activityViewModels()
 
         val adapter = PostsAdapter(object : OnInteractionListener {
             override fun onLike(post: Post) {
-                viewModel.likeById(post)
+                if (viewModelAuth.authenticated) {
+                    viewModelPost.likeById(post)
+                } else {
+                    AlertDialog.Builder(requireActivity()).apply {
+                        setTitle(getString(R.string.sign_in))
+                        setMessage(getString(R.string.to_interact_with_posts_you_need_to_log_in))
+                        setPositiveButton(getString(R.string.sign_in)) { _, _ ->
+                            findNavController().navigate(R.id.signInFragment)
+                        }
+                        setNegativeButton(getString(R.string.cancel)) { _, _ -> }
+                        setCancelable(true)
+                    }.create().show()
+                }
             }
 
             override fun onShare(post: Post) {
-                viewModel.shareById(post.id)
+                viewModelPost.shareById(post.id)
                 val intent = Intent().apply {
                     action = Intent.ACTION_SEND
                     putExtra(Intent.EXTRA_TEXT, post.content)
@@ -47,7 +62,7 @@ class FeedFragment : Fragment() {
             }
 
             override fun onRemove(post: Post) {
-                viewModel.removeById(post.id)
+                viewModelPost.removeById(post.id)
             }
 
             override fun onEdit(post: Post) {
@@ -59,7 +74,7 @@ class FeedFragment : Fragment() {
                             putLong("EXTRA_ID", post.id)
                         }
                     )
-                viewModel.edit(post)
+                viewModelPost.edit(post)
             }
 
             override fun onPost(post: Post) {
@@ -82,17 +97,17 @@ class FeedFragment : Fragment() {
 
             list.adapter = adapter
 
-            viewModel.dataState.observe(viewLifecycleOwner) { state ->
+            viewModelPost.dataState.observe(viewLifecycleOwner) { state ->
                 progress.isVisible = state.loading
                 swiperefresh.isRefreshing = state.refreshing
                 if (state.error) {
                     Snackbar.make(root, "Error loading", Snackbar.LENGTH_LONG)
                         .setAnchorView(binding.addNewPostButton)
-                        .setAction(R.string.retry_loading) { viewModel.load() }
+                        .setAction(R.string.retry_loading) { viewModelPost.load() }
                         .show()
                 }
             }
-            viewModel.data.observe(viewLifecycleOwner) { state ->
+            viewModelPost.data.observe(viewLifecycleOwner) { state ->
                 val isNewPost = state.posts.size > adapter.currentList.size && adapter.itemCount > 0
                 adapter.submitList(state.posts) {
                     if (isNewPost) list.smoothScrollToPosition(0)
@@ -100,23 +115,35 @@ class FeedFragment : Fragment() {
                 emptyText.isVisible = state.empty
             }
 
-            viewModel.newerCount.observe(viewLifecycleOwner) { count ->
+            viewModelPost.newerCount.observe(viewLifecycleOwner) { count ->
                 if (count > 0) {
                     getNewerPosts.visibility = View.VISIBLE
                 } else getNewerPosts.visibility = View.GONE
 
                 getNewerPosts.setOnClickListener {
-                    viewModel.getNewer(count.toLong())
+                    viewModelPost.getNewer(count.toLong())
                     getNewerPosts.visibility = View.GONE
                 }
             }
 
             swiperefresh.setOnRefreshListener {
-                viewModel.refreshPosts()
+                viewModelPost.refreshPosts()
             }
 
             addNewPostButton.setOnClickListener {
-                findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
+                if (viewModelAuth.authenticated) {
+                    findNavController().navigate(R.id.action_feedFragment_to_newPostFragment)
+                } else {
+                    AlertDialog.Builder(requireActivity()).apply {
+                        setTitle(getString(R.string.sign_in))
+                        setMessage(getString(R.string.to_interact_with_posts_you_need_to_log_in))
+                        setPositiveButton(getString(R.string.sign_in)) { _, _ ->
+                            findNavController().navigate(R.id.signInFragment)
+                        }
+                        setNegativeButton(getString(R.string.cancel)) { _, _ -> }
+                        setCancelable(true)
+                    }.create().show()
+                }
             }
             return root
         }

@@ -15,19 +15,11 @@
         android:layout_margin="@dimen/common_spacing"
         android:fontFamily="sans-serif-medium"
         android:text="@string/sign_in_to_nmedia"
-        android:textColor="@color/design_default_color_primary"
+        android:textColor="?attr/colorPrimary"
         android:textSize="36sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/group_success"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="visible"
-        app:constraint_referenced_ids="login, password" />
 
     <EditText
         android:id="@+id/login"
@@ -53,65 +45,40 @@
         app:layout_constraintTop_toBottomOf="@id/login"
         tools:ignore="VisualLintTextFieldSize" />
 
-    <androidx.constraintlayout.widget.Group
-        android:id="@+id/group_error"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:constraint_referenced_ids="login_error, password_error, password_hint, login_hint" />
-
-    <EditText
-        android:id="@+id/login_error"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/common_spacing"
-        android:autofillHints="yes"
-        android:backgroundTint="@color/red"
-        android:hint="@string/login"
-        android:inputType="text"
-        android:minHeight="48dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/label"
-        tools:ignore="VisualLintTextFieldSize" />
-
-    <TextView
-        android:id="@+id/login_hint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/login_error"
-        android:text="@string/invalid_login"
-        android:textColor="@color/red"
-        app:layout_constraintEnd_toEndOf="@id/login_error"/>
-
-    <EditText
-        android:id="@+id/password_error"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:autofillHints="password"
-        android:backgroundTint="@color/red"
-        android:hint="@string/password"
-        android:inputType="textPassword"
-        android:minHeight="48dp"
-        app:layout_constraintTop_toBottomOf="@id/login_hint"
-        tools:ignore="VisualLintTextFieldSize" />
-
-    <TextView
-        android:id="@+id/password_hint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/password_error"
-        android:text="@string/invalid_password"
-        android:textColor="@color/red"
-        app:layout_constraintEnd_toEndOf="@id/password_error"/>
-
     <com.google.android.material.button.MaterialButton
         android:id="@+id/signInButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="48sp"
+        android:layout_marginTop="@dimen/common_spacing"
         android:text="@string/sign_in"
         android:textColor="@color/white"
         android:textSize="16sp"
-        app:layout_constraintTop_toBottomOf="@id/password"
-        tools:ignore="VisualLintButtonSize" />
+        app:layout_constraintTop_toBottomOf="@+id/password"
+        tools:ignore="VisualLintButtonSize"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <TextView
+        android:id="@+id/noAccount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:gravity="center"
+        android:text="@string/don_t_have_an_account_yet"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/signInButton" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/signUpButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/sign_up"
+        android:textColor="?attr/colorOnBackground"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/noAccount"
+        tools:ignore="VisualLintButtonSize"
+        android:backgroundTint="@android:color/transparent"
+        app:strokeColor="?attr/colorPrimary"
+        app:strokeWidth="2dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

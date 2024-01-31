@@ -59,4 +59,12 @@
     <string name="sign_up_to_nmedia">Зарегистрируйтесь в NMedia</string>
     <string name="name">Имя</string>
     <string name="password_confirmation">Подтверждение пароля</string>
+    <string name="to_interact_with_posts_you_need_to_log_in">"Для взаимодействия с постами необходимо войти "</string>
+    <string name="passwords_don_t_match">Пароли не совпадают</string>
+    <string name="are_you_sure">Вы уверены?</string>
+    <string name="if_you_exit_now_progress_will_be_lost">Если вы выйдете сейчас, прогресс будет потерян</string>
+    <string name="get_out_anyway">Все равно выйти</string>
+    <string name="don_t_have_an_account_yet">Еще нет аккаунта?</string>
+    <string name="fields_cannot_be_empty">Поля не могут быть пустыми</string>
+    <string name="already_have_an_account">Уже есть аккаунт?</string>
 </resources>
