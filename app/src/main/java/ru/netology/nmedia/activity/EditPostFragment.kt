@@ -10,18 +10,18 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.BuildConfig.BASE_URL
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.ActivityEditPostBinding
 import ru.netology.nmedia.util.AndroidUtils
-import ru.netology.nmedia.util.StringArg
 import ru.netology.nmedia.util.load
 import ru.netology.nmedia.viewmodel.PostViewModel
 
+@AndroidEntryPoint
 class EditPostFragment : Fragment() {
-    companion object {
-        var Bundle.textArg: String? by StringArg
-    }
+
+    private val viewModel: PostViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,8 +29,6 @@ class EditPostFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = ActivityEditPostBinding.inflate(layoutInflater)
-
-        val viewModel: PostViewModel by activityViewModels()
         val id = arguments?.getLong("EXTRA_ID")
 
         with(binding) {
@@ -51,9 +49,9 @@ class EditPostFragment : Fragment() {
                 viewModel.cancel()
                 findNavController().navigateUp()
             }
-            viewModel.data.observe(viewLifecycleOwner){ state ->
+            viewModel.data.observe(viewLifecycleOwner) { state ->
                 val post = state.posts.find { it.id == id }
-                if (post?.attachment != null){
+                if (post?.attachment != null) {
                     attachment.visibility = View.VISIBLE
                     attachment.load("${BASE_URL}/media/${post.attachment!!.url}")
                 }

@@ -6,11 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.BuildConfig.BASE_URL
 import ru.netology.nmedia.databinding.FragmentPhotoBinding
 import ru.netology.nmedia.util.load
-
-
+@AndroidEntryPoint
 class PhotoFragment : Fragment() {
 
     override fun onCreateView(

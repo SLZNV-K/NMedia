@@ -20,20 +20,21 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.github.dhaval2404.imagepicker.ImagePicker
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentNewPostBinding
 import ru.netology.nmedia.model.PhotoModel
 import ru.netology.nmedia.util.AndroidUtils
 import ru.netology.nmedia.viewmodel.PostViewModel
 
-
+@AndroidEntryPoint
 class NewPostFragment : Fragment() {
+    private val viewModel: PostViewModel by activityViewModels()
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val viewModel by activityViewModels<PostViewModel>()
         val binding = FragmentNewPostBinding.inflate(layoutInflater, container, false)
         binding.newContent.requestFocus()
         val sharedPreference = activity?.getPreferences(Context.MODE_PRIVATE)
