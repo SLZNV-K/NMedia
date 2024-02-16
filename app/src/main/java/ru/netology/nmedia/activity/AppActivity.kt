@@ -16,6 +16,7 @@ import androidx.core.view.MenuProvider
 import androidx.navigation.findNavController
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.R
 import ru.netology.nmedia.auth.AppAuth
@@ -31,6 +32,9 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
 
     @Inject
     lateinit var provideGoogleApiAvailability: GoogleApiAvailability
+
+    @Inject
+    lateinit var provideRequest: FirebaseMessaging
 
     private val viewModel: AuthViewModel by viewModels()
 
@@ -110,6 +114,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
             return
         }
         requestPermissions(arrayOf(permission), 1)
+        provideRequest.token.addOnCompleteListener(::println)
     }
 
     private fun checkGoogleApiAvailability() {
