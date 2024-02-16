@@ -16,14 +16,24 @@ import androidx.core.view.MenuProvider
 import androidx.navigation.findNavController
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.R
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.viewmodel.AuthViewModel
+import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class AppActivity : AppCompatActivity(R.layout.activity_app) {
 
-    val viewModel by viewModels<AuthViewModel>()
+    @Inject
+    lateinit var appAuth: AppAuth
+
+    @Inject
+    lateinit var provideGoogleApiAvailability: GoogleApiAvailability
+
+    private val viewModel: AuthViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -71,7 +81,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
                                 setTitle(getString(R.string.are_you_sure))
                                 setMessage(getString(R.string.if_you_exit_now_progress_will_be_lost))
                                 setPositiveButton(getString(R.string.get_out_anyway)) { _, _ ->
-                                    AppAuth.getInstance().removeAuth()
+                                    appAuth.removeAuth()
                                     findNavController(R.id.nav_host_fragment).navigateUp()
                                 }
                                 setNegativeButton(getString(R.string.cancel)) { _, _ ->
@@ -79,10 +89,11 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
                                 setCancelable(true)
                             }.create().show()
                         } else {
-                            AppAuth.getInstance().removeAuth()
+                            appAuth.removeAuth()
                         }
                         true
                     }
+
                     else -> false
                 }
         })
@@ -102,7 +113,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
     }
 
     private fun checkGoogleApiAvailability() {
-        with(GoogleApiAvailability.getInstance()) {
+        with(provideGoogleApiAvailability) {
             val code = isGooglePlayServicesAvailable(this@AppActivity)
             if (code == ConnectionResult.SUCCESS) {
                 return@with

@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.BuildConfig.BASE_URL
 import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.reformatCount
@@ -19,15 +20,17 @@ import ru.netology.nmedia.util.load
 import ru.netology.nmedia.viewmodel.AuthViewModel
 import ru.netology.nmedia.viewmodel.PostViewModel
 
+@AndroidEntryPoint
 class PostDetailsFragment : Fragment() {
+
+    private val viewModel: PostViewModel by activityViewModels()
+    private val viewModelAuth: AuthViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentPostDetailsBinding.inflate(layoutInflater, container, false)
-        val viewModel: PostViewModel by activityViewModels()
-        val viewModelAuth: AuthViewModel by activityViewModels()
         val id = arguments?.getLong("EXTRA_ID")
 
         viewModel.dataState.observe(viewLifecycleOwner) {

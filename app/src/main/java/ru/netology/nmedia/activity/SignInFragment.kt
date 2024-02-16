@@ -8,18 +8,19 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentSignInBinding
 import ru.netology.nmedia.viewmodel.SignInViewModel
 
-
+@AndroidEntryPoint
 class SignInFragment : Fragment() {
+    private val viewModel: SignInViewModel by activityViewModels()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentSignInBinding.inflate(layoutInflater)
-        val viewModel: SignInViewModel by activityViewModels()
 
         with(binding) {
             val log = login.text
