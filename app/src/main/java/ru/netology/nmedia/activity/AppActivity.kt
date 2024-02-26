@@ -21,6 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.R
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.viewmodel.AuthViewModel
+import ru.netology.nmedia.viewmodel.PostViewModel
 import javax.inject.Inject
 
 
@@ -36,7 +37,8 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
     @Inject
     lateinit var provideRequest: FirebaseMessaging
 
-    private val viewModel: AuthViewModel by viewModels()
+    private val authViewModel: AuthViewModel by viewModels()
+    private val postViewModel: PostViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,8 +64,8 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
 
             override fun onPrepareMenu(menu: Menu) {
                 menu.let {
-                    it.setGroupVisible(R.id.unauthenticated, !viewModel.authenticated)
-                    it.setGroupVisible(R.id.authenticated, viewModel.authenticated)
+                    it.setGroupVisible(R.id.unauthenticated, !authViewModel.authenticated)
+                    it.setGroupVisible(R.id.authenticated, authViewModel.authenticated)
                 }
             }
 
@@ -92,9 +94,11 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
                                 }
                                 setCancelable(true)
                             }.create().show()
+
                         } else {
                             appAuth.removeAuth()
                         }
+                        postViewModel.refreshPosts()
                         true
                     }
 
