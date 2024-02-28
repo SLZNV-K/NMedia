@@ -8,6 +8,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -30,10 +31,11 @@ private val empty = Post(
 )
 private val noPhoto = PhotoModel()
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class PostViewModel @Inject constructor(
     private val repository: PostRepository,
-    appAuth: AppAuth
+    appAuth: AppAuth,
 ) : ViewModel() {
 
     private val cached = repository
@@ -49,10 +51,6 @@ class PostViewModel @Inject constructor(
             }
         }
 
-//    val newerCount = data.switchMap {
-//        repository.getNewer(it.posts.firstOrNull()?.id ?: 0L).flowOn(Dispatchers.Default)
-//    }
-
     private val _photo = MutableLiveData<PhotoModel?>(null)
     val photo: LiveData<PhotoModel?>
         get() = _photo
@@ -63,6 +61,8 @@ class PostViewModel @Inject constructor(
 
     private val edited = MutableLiveData(empty)
     private val _postCreated = SingleLiveEvent<Unit>()
+
+    var pickedPost = empty
     val postCreated: LiveData<Unit>
         get() = _postCreated
 
@@ -73,23 +73,11 @@ class PostViewModel @Inject constructor(
     fun load() = viewModelScope.launch {
         _dataState.value = FeedModelState(loading = true)
         try {
-            repository.getAll()
             _dataState.value = FeedModelState()
         } catch (e: Exception) {
             _dataState.value = FeedModelState(error = true)
         }
     }
-
-//    fun getNewer(id: Long) {
-//        repository.getNewer(id)
-//        viewModelScope.launch {
-//            try {
-//                repository.updatePosts()
-//            } catch (e: Exception) {
-//                _dataState.value = FeedModelState(error = true)
-//            }
-//        }
-//    }
 
     fun savePhoto(photoModel: PhotoModel) {
         _photo.value = photoModel
@@ -107,13 +95,24 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    fun refreshPosts() = viewModelScope.launch {
+    fun updatePosts() = viewModelScope.launch {
         try {
             _dataState.value = FeedModelState(refreshing = true)
-            repository.getAll()
+            repository.updatePosts()
             _dataState.value = FeedModelState()
         } catch (e: Exception) {
             _dataState.value = FeedModelState(error = true)
+        }
+    }
+
+    fun getPostById(id: Long) {
+        viewModelScope.launch {
+            try {
+                pickedPost = repository.getPostById(id)
+                _dataState.value = FeedModelState()
+            } catch (e: Exception) {
+                _dataState.value = FeedModelState(error = true)
+            }
         }
     }
 

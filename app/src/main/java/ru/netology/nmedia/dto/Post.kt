@@ -1,5 +1,7 @@
 package ru.netology.nmedia.dto
 
+import java.io.Serializable
+
 data class Post(
     val id: Long,
     val authorId: Long,
@@ -16,7 +18,7 @@ data class Post(
     var isSaveOnService: Boolean = false,
     var display: Boolean = false,
     val ownedByMe: Boolean = false
-)
+) : Serializable
 
 enum class AttachmentType {
     IMAGE

@@ -11,19 +11,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.paging.AsyncPagingDataDiffer
-import androidx.paging.PagingData
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.BuildConfig.BASE_URL
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.ActivityEditPostBinding
-import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.util.AndroidUtils
-import ru.netology.nmedia.util.PostDiffCallBack
-import ru.netology.nmedia.util.PostListCallback
 import ru.netology.nmedia.util.load
 import ru.netology.nmedia.viewmodel.PostViewModel
 
@@ -40,11 +33,11 @@ class EditPostFragment : Fragment() {
         val binding = ActivityEditPostBinding.inflate(layoutInflater)
         val id = arguments?.getLong("EXTRA_ID")
 
-        val differ = AsyncPagingDataDiffer(
-            diffCallback = PostDiffCallBack,
-            updateCallback = PostListCallback(),
-            workerDispatcher = Dispatchers.Main
-        )
+//        val differ = AsyncPagingDataDiffer(
+//            diffCallback = PostDiffCallBack,
+//            updateCallback = PostListCallback(),
+//            workerDispatcher = Dispatchers.Main
+//        )
 
         with(binding) {
             editContent.requestFocus()
@@ -65,24 +58,18 @@ class EditPostFragment : Fragment() {
                 findNavController().navigateUp()
             }
 
-
-//            viewModel.data.observe(viewLifecycleOwner) { state ->
-//                val post = state.posts.find { it.id == id }
-//                if (post?.attachment != null) {
-//                    attachment.visibility = View.VISIBLE
-//                    attachment.load("${BASE_URL}/media/${post.attachment!!.url}")
-//                }
-//            }
-
             viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.data.collectLatest { pagerData: PagingData<Post> ->
-                    differ.submitData(pagerData)
-                    val post = differ.snapshot().items.find { it.id == id }
-                    if (post?.attachment != null) {
-                        attachment.visibility = View.VISIBLE
-                        attachment.load("${BASE_URL}/media/${post.attachment!!.url}")
-                    }
+//                viewModel.data.collectLatest { pagerData: PagingData<Post> ->
+//                    differ.submitData(pagerData)
+//                    val post = differ.snapshot().items.find { it.id == id }
+
+                id?.let { viewModel.getPostById(it) }
+                val post = viewModel.pickedPost
+                if (post.attachment != null) {
+                    attachment.visibility = View.VISIBLE
+                    attachment.load("${BASE_URL}/media/${post.attachment!!.url}")
                 }
+
             }
 
             requireActivity().onBackPressedDispatcher.addCallback(

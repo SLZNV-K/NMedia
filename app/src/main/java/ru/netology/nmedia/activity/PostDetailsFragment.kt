@@ -10,21 +10,13 @@ import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.paging.AsyncPagingDataDiffer
-import androidx.paging.PagingData
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import ru.netology.nmedia.BuildConfig.BASE_URL
 import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.reformatCount
 import ru.netology.nmedia.databinding.FragmentPostDetailsBinding
 import ru.netology.nmedia.dto.Post
-import ru.netology.nmedia.util.PostDiffCallBack
-import ru.netology.nmedia.util.PostListCallback
 import ru.netology.nmedia.util.load
 import ru.netology.nmedia.viewmodel.AuthViewModel
 import ru.netology.nmedia.viewmodel.PostViewModel
@@ -40,13 +32,7 @@ class PostDetailsFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val binding = FragmentPostDetailsBinding.inflate(layoutInflater, container, false)
-        val id = arguments?.getLong("EXTRA_ID")
-
-        val differ = AsyncPagingDataDiffer(
-            diffCallback = PostDiffCallBack,
-            updateCallback = PostListCallback(),
-            workerDispatcher = Dispatchers.Main
-        )
+        val post = arguments?.getSerializable("EXTRA_POST") as Post
 
         viewModel.dataState.observe(viewLifecycleOwner) {
             if (it.error) {
@@ -59,20 +45,8 @@ class PostDetailsFragment : Fragment() {
             }
         }
 
-
-//        viewModel.data.observe(viewLifecycleOwner) { state ->
-//            val post = state.posts.find { it.id == id }
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.data.collectLatest { pagerData: PagingData<Post> ->
-                differ.submitData(pagerData)
-            }
-        }
-        val post = differ.snapshot().items.find { it.id == id }
-        if (post == null) {
-            findNavController().navigateUp()
-        }
         with(binding) {
-            author.text = post!!.author
+            author.text = post.author
             published.text = post.published
             avatar.load("${BASE_URL}/avatars/${post.authorAvatar}", true)
             newContent.text = post.content
@@ -147,6 +121,7 @@ class PostDetailsFragment : Fragment() {
                 }.show()
             }
         }
+
         return binding.root
     }
 }

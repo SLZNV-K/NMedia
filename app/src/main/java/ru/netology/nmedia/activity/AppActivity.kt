@@ -98,7 +98,7 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
                         } else {
                             appAuth.removeAuth()
                         }
-                        postViewModel.refreshPosts()
+                        postViewModel.updatePosts()
                         true
                     }
 

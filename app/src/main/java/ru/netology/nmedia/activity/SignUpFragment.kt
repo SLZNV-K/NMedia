@@ -24,7 +24,7 @@ import ru.netology.nmedia.viewmodel.SignUpViewModel
 
 @AndroidEntryPoint
 class SignUpFragment : Fragment() {
-    private val viewModel: SignUpViewModel by activityViewModels()
+    private val authViewModel: SignUpViewModel by activityViewModels()
     private val postViewModel: PostViewModel by activityViewModels()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -83,13 +83,13 @@ class SignUpFragment : Fragment() {
                             Toast.LENGTH_LONG
                         ).show()
                     } else {
-                        viewModel.registration(
+                        authViewModel.registration(
                             login.toString(),
                             password.toString(),
                             name.toString(),
                             photo
                         )
-                        postViewModel.refreshPosts()
+                        postViewModel.updatePosts()
                         val previousFragment =
                             findNavController().previousBackStackEntry?.destination?.id
                         if (previousFragment == R.id.signInFragment) {

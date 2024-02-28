@@ -16,7 +16,7 @@ import ru.netology.nmedia.viewmodel.SignInViewModel
 
 @AndroidEntryPoint
 class SignInFragment : Fragment() {
-    private val viewModel: SignInViewModel by activityViewModels()
+    private val authViewModel: SignInViewModel by activityViewModels()
     private val postViewModel: PostViewModel by activityViewModels()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,7 +28,7 @@ class SignInFragment : Fragment() {
             val log = login.text
             val pass = password.text
 
-            viewModel.authStateModel.observe(viewLifecycleOwner) { state ->
+            authViewModel.authStateModel.observe(viewLifecycleOwner) { state ->
                 if (state!!.error) {
                     login.error = getString(R.string.invalid_login)
                     password.error = getString(R.string.invalid_password)
@@ -50,8 +50,8 @@ class SignInFragment : Fragment() {
                     )
                         .show()
                 } else {
-                    viewModel.updateUser(log.toString(), pass.toString())
-                    postViewModel.refreshPosts()
+                    authViewModel.updateUser(log.toString(), pass.toString())
+                    postViewModel.updatePosts()
                 }
             }
 
