@@ -11,13 +11,11 @@ import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.FragmentSignInBinding
-import ru.netology.nmedia.viewmodel.PostViewModel
 import ru.netology.nmedia.viewmodel.SignInViewModel
 
 @AndroidEntryPoint
 class SignInFragment : Fragment() {
     private val authViewModel: SignInViewModel by activityViewModels()
-    private val postViewModel: PostViewModel by activityViewModels()
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -51,7 +49,6 @@ class SignInFragment : Fragment() {
                         .show()
                 } else {
                     authViewModel.updateUser(log.toString(), pass.toString())
-                    postViewModel.updatePosts()
                 }
             }
 

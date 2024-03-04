@@ -5,7 +5,9 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -30,7 +32,7 @@ import javax.inject.Inject
 class PostRepositoryRetrofitImpl @Inject constructor(
     private val dao: PostDao,
     private val apiService: PostApiService,
-    postRemoteKeyDao: PostRemoteKeyDao,
+    private val postRemoteKeyDao: PostRemoteKeyDao,
     appDb: AppDb
 ) : PostRepository {
     @OptIn(ExperimentalPagingApi::class)
@@ -46,52 +48,13 @@ class PostRepositoryRetrofitImpl @Inject constructor(
     ).flow.map { it.map(PostEntity::toDto) }
 
 
-//    override suspend fun getAll() {
-//        try {
-//            val response = apiService.getLatest(25)
-//            if (!response.isSuccessful) {
-//                throw ApiError(response.code(), response.message())
-//            }
-//            val body = response.body() ?: throw ApiError(response.code(), response.message())
-//            body.map {
-//                it.isSaveOnService = true
-//                it.display = true
-//            }
-//            dao.insert(body.toEntity())
-//        } catch (e: IOException) {
-//            throw NetworkError
-//        } catch (e: Exception) {
-//            throw UnknownError
-//        }
-//    }
-
-//    override fun getNewer(id: Long): Flow<Int> = flow {
-//        while (true) {
-//            delay(10_000L)
-//            try {
-//                val response = apiService.getNewer(id)
-//                if (!response.isSuccessful) {
-//                    throw ApiError(response.code(), response.message())
-//                }
-//                val body = response.body() ?: throw ApiError(response.code(), response.message())
-//                body.map {
-//                    it.isSaveOnService = true
-//                    it.display = false
-//                }
-//                dao.insertShadow(body.toEntity())
-//                emit(body.size)
-//            } catch (e: IOException) {
-//                throw NetworkError
-//            } catch (e: Exception) {
-//                throw UnknownError
-//            }
-//        }
-//    }.catch { it.printStackTrace() }
-
-    override suspend fun updatePosts() {
-        dao.updatePosts()
-        apiService.getLatest(dao.getLastId().toInt())
+    override suspend fun getNewerCount(): Flow<Long> = flow {
+        while (true) {
+            delay(10_000L)
+            apiService.getNewerCount(postRemoteKeyDao.max()?: 0L).body()?.count ?: 0L
+        }
     }
+
 
     override suspend fun getPostById(id: Long) = dao.getPostById(id).toDto()
 

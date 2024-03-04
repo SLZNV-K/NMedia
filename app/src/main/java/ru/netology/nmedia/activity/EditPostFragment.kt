@@ -33,12 +33,6 @@ class EditPostFragment : Fragment() {
         val binding = ActivityEditPostBinding.inflate(layoutInflater)
         val id = arguments?.getLong("EXTRA_ID")
 
-//        val differ = AsyncPagingDataDiffer(
-//            diffCallback = PostDiffCallBack,
-//            updateCallback = PostListCallback(),
-//            workerDispatcher = Dispatchers.Main
-//        )
-
         with(binding) {
             editContent.requestFocus()
             editContent.setText(arguments?.getString("EXTRA_CONTENT"))
@@ -59,17 +53,14 @@ class EditPostFragment : Fragment() {
             }
 
             viewLifecycleOwner.lifecycleScope.launch {
-//                viewModel.data.collectLatest { pagerData: PagingData<Post> ->
-//                    differ.submitData(pagerData)
-//                    val post = differ.snapshot().items.find { it.id == id }
-
                 id?.let { viewModel.getPostById(it) }
-                val post = viewModel.pickedPost
-                if (post.attachment != null) {
-                    attachment.visibility = View.VISIBLE
-                    attachment.load("${BASE_URL}/media/${post.attachment!!.url}")
+                viewModel.pickedPost.observe(viewLifecycleOwner) {
+                    val post = it
+                    if (post.attachment != null) {
+                        attachment.visibility = View.VISIBLE
+                        attachment.load("${BASE_URL}/media/${post.attachment!!.url}")
+                    }
                 }
-
             }
 
             requireActivity().onBackPressedDispatcher.addCallback(

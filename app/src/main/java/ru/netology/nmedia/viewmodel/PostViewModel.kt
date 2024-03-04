@@ -8,9 +8,11 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.auth.AppAuth
@@ -22,12 +24,7 @@ import ru.netology.nmedia.util.SingleLiveEvent
 import javax.inject.Inject
 
 private val empty = Post(
-    id = 0,
-    authorId = 0,
-    content = "",
-    author = "",
-    authorAvatar = "",
-    published = ""
+    id = 0, authorId = 0, content = "", author = "", authorAvatar = "", published = ""
 )
 private val noPhoto = PhotoModel()
 
@@ -38,18 +35,16 @@ class PostViewModel @Inject constructor(
     appAuth: AppAuth,
 ) : ViewModel() {
 
-    private val cached = repository
-        .data
-        .cachedIn(viewModelScope)
+    private val cached = repository.data.cachedIn(viewModelScope)
 
-    val data: Flow<PagingData<Post>> = appAuth.authState
-        .flatMapLatest { (myId, _) ->
+    val data: Flow<PagingData<Post>> = appAuth.authState.flatMapLatest { (myId, _) ->
             cached.map { pagingData ->
                 pagingData.map { post ->
                     post.copy(ownedByMe = post.authorId == myId)
                 }
             }
         }
+
 
     private val _photo = MutableLiveData<PhotoModel?>(null)
     val photo: LiveData<PhotoModel?>
@@ -62,9 +57,15 @@ class PostViewModel @Inject constructor(
     private val edited = MutableLiveData(empty)
     private val _postCreated = SingleLiveEvent<Unit>()
 
-    var pickedPost = empty
+    private val _pickedPost = MutableLiveData<Post>()
+    val pickedPost: MutableLiveData<Post>
+        get() = _pickedPost
+
     val postCreated: LiveData<Unit>
         get() = _postCreated
+
+    private val _newPostsCount = MutableLiveData<Flow<Long>>()
+    val newPostsCount: MutableLiveData<Flow<Long>> = _newPostsCount
 
     init {
         load()
@@ -76,6 +77,12 @@ class PostViewModel @Inject constructor(
             _dataState.value = FeedModelState()
         } catch (e: Exception) {
             _dataState.value = FeedModelState(error = true)
+        }
+    }
+
+    fun checkForNewPosts() {
+        viewModelScope.launch {
+            _newPostsCount.value = repository.getNewerCount().flowOn(Dispatchers.Default)
         }
     }
 
@@ -95,50 +102,35 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    fun updatePosts() = viewModelScope.launch {
+    fun getPostById(id: Long) = viewModelScope.launch {
         try {
-            _dataState.value = FeedModelState(refreshing = true)
-            repository.updatePosts()
+            pickedPost.value = repository.getPostById(id)
             _dataState.value = FeedModelState()
         } catch (e: Exception) {
             _dataState.value = FeedModelState(error = true)
         }
     }
 
-    fun getPostById(id: Long) {
-        viewModelScope.launch {
-            try {
-                pickedPost = repository.getPostById(id)
-                _dataState.value = FeedModelState()
-            } catch (e: Exception) {
-                _dataState.value = FeedModelState(error = true)
+
+    fun likeById(post: Post) = viewModelScope.launch {
+        try {
+            if (!post.likedByMe) {
+                repository.likeById(post.id)
+            } else {
+                repository.dislikeById(post.id)
             }
+            _dataState.value = FeedModelState()
+        } catch (e: Exception) {
+            _dataState.value = FeedModelState(error = true)
         }
     }
 
-    fun likeById(post: Post) {
-        viewModelScope.launch {
-            try {
-                if (!post.likedByMe) {
-                    repository.likeById(post.id)
-                } else {
-                    repository.dislikeById(post.id)
-                }
-                _dataState.value = FeedModelState()
-            } catch (e: Exception) {
-                _dataState.value = FeedModelState(error = true)
-            }
-        }
-    }
-
-    fun removeById(id: Long) {
-        viewModelScope.launch {
-            try {
-                repository.removeById(id)
-                _dataState.value = FeedModelState()
-            } catch (e: Exception) {
-                _dataState.value = FeedModelState(error = true)
-            }
+    fun removeById(id: Long) = viewModelScope.launch {
+        try {
+            repository.removeById(id)
+            _dataState.value = FeedModelState()
+        } catch (e: Exception) {
+            _dataState.value = FeedModelState(error = true)
         }
     }
 

@@ -86,8 +86,8 @@ class FeedFragment : Fragment() {
                 findNavController()
                     .navigate(
                         R.id.action_feedFragment_to_postDetailsFragment,
-                        Bundle().apply { putSerializable("EXTRA_POST", post) })
-
+                        Bundle().apply { putLong("EXTRA_ID", post.id) }
+                    )
             }
 
             override fun onPhoto(post: Post) {
@@ -117,6 +117,7 @@ class FeedFragment : Fragment() {
             viewLifecycleOwner.lifecycleScope.launch {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     viewModelPost.data.collectLatest(adapter::submitData)
+                    viewModelPost.checkForNewPosts()
                 }
             }
 
@@ -130,7 +131,36 @@ class FeedFragment : Fragment() {
                     }
                 }
             }
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModelAuth.data.collectLatest {
+                        adapter.refresh()
+                    }
+                }
+            }
+
             swiperefresh.setOnRefreshListener(adapter::refresh)
+
+            viewModelPost.newPostsCount.observe(viewLifecycleOwner) { count ->
+                viewLifecycleOwner.lifecycleScope.launch {
+                    viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                        count.collectLatest {
+                            if (it > 0) {
+                                getNewerPostsButton.visibility = View.VISIBLE
+                                getNewerPostsButton.text = count.toString()
+                            } else {
+                                getNewerPostsButton.visibility = View.GONE
+                            }
+                        }
+                    }
+                }
+            }
+
+            getNewerPostsButton.setOnClickListener {
+                adapter.refresh()
+            }
+
 
             addNewPostButton.setOnClickListener {
                 if (viewModelAuth.authenticated) {

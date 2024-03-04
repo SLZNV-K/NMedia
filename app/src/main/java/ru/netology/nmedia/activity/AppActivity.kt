@@ -21,7 +21,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import ru.netology.nmedia.R
 import ru.netology.nmedia.auth.AppAuth
 import ru.netology.nmedia.viewmodel.AuthViewModel
-import ru.netology.nmedia.viewmodel.PostViewModel
 import javax.inject.Inject
 
 
@@ -38,7 +37,6 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
     lateinit var provideRequest: FirebaseMessaging
 
     private val authViewModel: AuthViewModel by viewModels()
-    private val postViewModel: PostViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,7 +96,6 @@ class AppActivity : AppCompatActivity(R.layout.activity_app) {
                         } else {
                             appAuth.removeAuth()
                         }
-                        postViewModel.updatePosts()
                         true
                     }
 

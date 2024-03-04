@@ -15,6 +15,7 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import ru.netology.nmedia.auth.AuthState
 import ru.netology.nmedia.dto.Media
+import ru.netology.nmedia.dto.NewerCount
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.dto.PushToken
 
@@ -29,8 +30,8 @@ interface PostApiService {
     @GET("posts/{id}/after")
     suspend fun getAfter(@Path("id") id: Long, @Query("count") count: Int): Response<List<Post>>
 
-//    @GET("posts/{id}")
-//    suspend fun getById(@Path("id") id: Long): Response<Post>
+    @GET("posts/{id}/newer-count")
+    fun getNewerCount(@Path("id") id: Long): Response<NewerCount>
 
     @POST("posts")
     suspend fun save(@Body post: Post): Response<Post>
