@@ -117,7 +117,6 @@ class FeedFragment : Fragment() {
             viewLifecycleOwner.lifecycleScope.launch {
                 viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                     viewModelPost.data.collectLatest(adapter::submitData)
-                    viewModelPost.checkForNewPosts()
                 }
             }
 
@@ -142,25 +141,23 @@ class FeedFragment : Fragment() {
 
             swiperefresh.setOnRefreshListener(adapter::refresh)
 
-            viewModelPost.newPostsCount.observe(viewLifecycleOwner) { count ->
-                viewLifecycleOwner.lifecycleScope.launch {
-                    viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                        count.collectLatest {
-                            if (it > 0) {
-                                getNewerPostsButton.visibility = View.VISIBLE
-                                getNewerPostsButton.text = count.toString()
-                            } else {
-                                getNewerPostsButton.visibility = View.GONE
-                            }
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModelPost.newPostsCount().collectLatest {
+                        if (it > 0) {
+                            getNewerPostsButton.visibility = View.VISIBLE
+                            val newText = getString(R.string.new_entries) + " (${it})"
+                            getNewerPostsButton.text = newText
+                        } else {
+                            getNewerPostsButton.visibility = View.GONE
                         }
                     }
                 }
             }
-
             getNewerPostsButton.setOnClickListener {
+                getNewerPostsButton.visibility = View.GONE
                 adapter.refresh()
             }
-
 
             addNewPostButton.setOnClickListener {
                 if (viewModelAuth.authenticated) {

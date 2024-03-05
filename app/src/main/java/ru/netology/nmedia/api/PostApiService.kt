@@ -31,7 +31,7 @@ interface PostApiService {
     suspend fun getAfter(@Path("id") id: Long, @Query("count") count: Int): Response<List<Post>>
 
     @GET("posts/{id}/newer-count")
-    fun getNewerCount(@Path("id") id: Long): Response<NewerCount>
+    suspend fun getNewerCount(@Path("id") id: Long): Response<NewerCount>
 
     @POST("posts")
     suspend fun save(@Body post: Post): Response<Post>

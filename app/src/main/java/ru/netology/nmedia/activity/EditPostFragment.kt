@@ -54,8 +54,7 @@ class EditPostFragment : Fragment() {
 
             viewLifecycleOwner.lifecycleScope.launch {
                 id?.let { viewModel.getPostById(it) }
-                viewModel.pickedPost.observe(viewLifecycleOwner) {
-                    val post = it
+                viewModel.pickedPost.observe(viewLifecycleOwner) { post ->
                     if (post.attachment != null) {
                         attachment.visibility = View.VISIBLE
                         attachment.load("${BASE_URL}/media/${post.attachment!!.url}")

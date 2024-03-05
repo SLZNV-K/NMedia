@@ -51,10 +51,9 @@ class PostRepositoryRetrofitImpl @Inject constructor(
     override suspend fun getNewerCount(): Flow<Long> = flow {
         while (true) {
             delay(10_000L)
-            apiService.getNewerCount(postRemoteKeyDao.max()?: 0L).body()?.count ?: 0L
+            emit(apiService.getNewerCount(postRemoteKeyDao.max() ?: 0L).body()?.count ?: 0L)
         }
     }
-
 
     override suspend fun getPostById(id: Long) = dao.getPostById(id).toDto()
 

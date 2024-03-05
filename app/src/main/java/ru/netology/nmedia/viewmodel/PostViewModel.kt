@@ -8,11 +8,9 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.auth.AppAuth
@@ -38,12 +36,12 @@ class PostViewModel @Inject constructor(
     private val cached = repository.data.cachedIn(viewModelScope)
 
     val data: Flow<PagingData<Post>> = appAuth.authState.flatMapLatest { (myId, _) ->
-            cached.map { pagingData ->
-                pagingData.map { post ->
-                    post.copy(ownedByMe = post.authorId == myId)
-                }
+        cached.map { pagingData ->
+            pagingData.map { post ->
+                post.copy(ownedByMe = post.authorId == myId)
             }
         }
+    }
 
 
     private val _photo = MutableLiveData<PhotoModel?>(null)
@@ -64,9 +62,6 @@ class PostViewModel @Inject constructor(
     val postCreated: LiveData<Unit>
         get() = _postCreated
 
-    private val _newPostsCount = MutableLiveData<Flow<Long>>()
-    val newPostsCount: MutableLiveData<Flow<Long>> = _newPostsCount
-
     init {
         load()
     }
@@ -80,11 +75,7 @@ class PostViewModel @Inject constructor(
         }
     }
 
-    fun checkForNewPosts() {
-        viewModelScope.launch {
-            _newPostsCount.value = repository.getNewerCount().flowOn(Dispatchers.Default)
-        }
-    }
+    suspend fun newPostsCount(): Flow<Long> = repository.getNewerCount()
 
     fun savePhoto(photoModel: PhotoModel) {
         _photo.value = photoModel

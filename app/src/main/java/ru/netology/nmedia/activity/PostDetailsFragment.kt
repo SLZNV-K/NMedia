@@ -13,6 +13,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.BuildConfig.BASE_URL
 import ru.netology.nmedia.R
@@ -46,10 +47,13 @@ class PostDetailsFragment : Fragment() {
             }
         }
         viewLifecycleOwner.lifecycleScope.launch {
-            id?.let { viewModel.getPostById(it) }
-            viewModel.pickedPost.observe(viewLifecycleOwner) {
-                val post = it
-
+            viewLifecycleOwner.lifecycleScope.launch {
+                while (true) {
+                    id?.let { viewModel.getPostById(it) }
+                    delay(16)
+                }
+            }
+            viewModel.pickedPost.observe(viewLifecycleOwner) { post ->
                 with(binding) {
                     author.text = post.author
                     published.text = post.published
