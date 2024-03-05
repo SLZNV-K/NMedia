@@ -9,9 +9,15 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.OnInteractionListener
 import ru.netology.nmedia.adapter.PostsAdapter
@@ -80,7 +86,8 @@ class FeedFragment : Fragment() {
                 findNavController()
                     .navigate(
                         R.id.action_feedFragment_to_postDetailsFragment,
-                        Bundle().apply { putLong("EXTRA_ID", post.id) })
+                        Bundle().apply { putLong("EXTRA_ID", post.id) }
+                    )
             }
 
             override fun onPhoto(post: Post) {
@@ -106,27 +113,50 @@ class FeedFragment : Fragment() {
                         .show()
                 }
             }
-            viewModelPost.data.observe(viewLifecycleOwner) { state ->
-                val isNewPost = state.posts.size > adapter.currentList.size && adapter.itemCount > 0
-                adapter.submitList(state.posts) {
-                    if (isNewPost) list.smoothScrollToPosition(0)
-                }
-                emptyText.isVisible = state.empty
-            }
 
-            viewModelPost.newerCount.observe(viewLifecycleOwner) { count ->
-                if (count > 0) {
-                    getNewerPosts.visibility = View.VISIBLE
-                } else getNewerPosts.visibility = View.GONE
-
-                getNewerPosts.setOnClickListener {
-                    viewModelPost.getNewer(count.toLong())
-                    getNewerPosts.visibility = View.GONE
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModelPost.data.collectLatest(adapter::submitData)
                 }
             }
 
-            swiperefresh.setOnRefreshListener {
-                viewModelPost.refreshPosts()
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    adapter.loadStateFlow.collectLatest { state ->
+                        binding.swiperefresh.isRefreshing =
+                            state.refresh is LoadState.Loading ||
+                                    state.prepend is LoadState.Loading ||
+                                    state.append is LoadState.Loading
+                    }
+                }
+            }
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModelAuth.data.collectLatest {
+                        adapter.refresh()
+                    }
+                }
+            }
+
+            swiperefresh.setOnRefreshListener(adapter::refresh)
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    viewModelPost.newPostsCount().collectLatest {
+                        if (it > 0) {
+                            getNewerPostsButton.visibility = View.VISIBLE
+                            val newText = getString(R.string.new_entries) + " (${it})"
+                            getNewerPostsButton.text = newText
+                        } else {
+                            getNewerPostsButton.visibility = View.GONE
+                        }
+                    }
+                }
+            }
+            getNewerPostsButton.setOnClickListener {
+                getNewerPostsButton.visibility = View.GONE
+                adapter.refresh()
             }
 
             addNewPostButton.setOnClickListener {
@@ -144,6 +174,7 @@ class FeedFragment : Fragment() {
                     }.create().show()
                 }
             }
+
             return root
         }
     }

@@ -10,8 +10,11 @@ import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import ru.netology.nmedia.BuildConfig.BASE_URL
 import ru.netology.nmedia.R
 import ru.netology.nmedia.adapter.reformatCount
@@ -43,86 +46,89 @@ class PostDetailsFragment : Fragment() {
                 return@observe
             }
         }
-        viewModel.data.observe(viewLifecycleOwner) { state ->
-            val post = state.posts.find { it.id == id }
-            if (post == null) {
-                findNavController().navigateUp()
-                return@observe
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycleScope.launch {
+                while (true) {
+                    id?.let { viewModel.getPostById(it) }
+                    delay(16)
+                }
             }
-            with(binding) {
-                author.text = post.author
-                published.text = post.published
-                avatar.load("${BASE_URL}/avatars/${post.authorAvatar}", true)
-                newContent.text = post.content
-                like.isChecked = post.likedByMe
-                like.text = reformatCount(post.likes)
-                share.isClickable = post.sharedByMe
-                share.text = reformatCount(post.shares)
-                viewingCount.text = reformatCount(post.views)
+            viewModel.pickedPost.observe(viewLifecycleOwner) { post ->
+                with(binding) {
+                    author.text = post.author
+                    published.text = post.published
+                    avatar.load("${BASE_URL}/avatars/${post.authorAvatar}", true)
+                    newContent.text = post.content
+                    like.isChecked = post.likedByMe
+                    like.text = reformatCount(post.likes)
+                    share.isClickable = post.sharedByMe
+                    share.text = reformatCount(post.shares)
+                    viewingCount.text = reformatCount(post.views)
 
-                if (post.attachment != null) {
-                    attachment.visibility = View.VISIBLE
-                    attachment.load("${BASE_URL}/media/${post.attachment!!.url}")
-                }
+                    if (post.attachment != null) {
+                        attachment.visibility = View.VISIBLE
+                        attachment.load("${BASE_URL}/media/${post.attachment!!.url}")
+                    } else attachment.visibility = View.GONE
 
-                attachment.setOnClickListener {
-                    findNavController()
-                        .navigate(R.id.action_postDetailsFragment_to_photoFragment,
-                            Bundle().apply { putString("EXTRA_URI", post.attachment?.url) })
-                }
-
-                like.setOnClickListener {
-                    if (viewModelAuth.authenticated) {
-                        viewModel.likeById(post)
-                    } else {
-                        AlertDialog.Builder(requireActivity()).apply {
-                            setTitle(getString(R.string.sign_in))
-                            setMessage(getString(R.string.to_interact_with_posts_you_need_to_log_in))
-                            setPositiveButton(getString(R.string.sign_in)) { _, _ ->
-                                findNavController().navigate(R.id.signInFragment)
-                            }
-                            setNegativeButton(getString(R.string.cancel)) { _, _ -> }
-                            setCancelable(true)
-                        }.create().show()
+                    attachment.setOnClickListener {
+                        findNavController()
+                            .navigate(R.id.action_postDetailsFragment_to_photoFragment,
+                                Bundle().apply { putString("EXTRA_URI", post.attachment?.url) })
                     }
-                }
-                share.setOnClickListener {
-                    viewModel.shareById(post.id)
-                    val intent = Intent().apply {
-                        action = Intent.ACTION_SEND
-                        putExtra(Intent.EXTRA_TEXT, post.content)
-                        type = "text/plain"
-                    }
-                    val chooser = Intent.createChooser(intent, null)
-                    startActivity(chooser)
-                }
-                menu.setOnClickListener { view ->
-                    PopupMenu(view.context, view).apply {
-                        inflate(R.menu.options_post)
-                        setOnMenuItemClickListener { menuItem ->
-                            when (menuItem.itemId) {
-                                R.id.edit -> {
-                                    findNavController()
-                                        .navigate(
-                                            R.id.action_postDetailsFragment_to_editPostFragment,
-                                            Bundle().apply {
-                                                putString("EXTRA_CONTENT", post.content)
-                                                putLong("EXTRA_ID", post.id)
-                                            }
-                                        )
-                                    viewModel.edit(post)
-                                    true
-                                }
 
-                                R.id.remove -> {
-                                    viewModel.removeById(post.id)
-                                    true
+                    like.setOnClickListener {
+                        if (viewModelAuth.authenticated) {
+                            viewModel.likeById(post)
+                        } else {
+                            AlertDialog.Builder(requireActivity()).apply {
+                                setTitle(getString(R.string.sign_in))
+                                setMessage(getString(R.string.to_interact_with_posts_you_need_to_log_in))
+                                setPositiveButton(getString(R.string.sign_in)) { _, _ ->
+                                    findNavController().navigate(R.id.signInFragment)
                                 }
-
-                                else -> false
-                            }
+                                setNegativeButton(getString(R.string.cancel)) { _, _ -> }
+                                setCancelable(true)
+                            }.create().show()
                         }
-                    }.show()
+                    }
+                    share.setOnClickListener {
+                        viewModel.shareById(post.id)
+                        val intent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, post.content)
+                            type = "text/plain"
+                        }
+                        val chooser = Intent.createChooser(intent, null)
+                        startActivity(chooser)
+                    }
+                    menu.setOnClickListener { view ->
+                        PopupMenu(view.context, view).apply {
+                            inflate(R.menu.options_post)
+                            setOnMenuItemClickListener { menuItem ->
+                                when (menuItem.itemId) {
+                                    R.id.edit -> {
+                                        findNavController()
+                                            .navigate(
+                                                R.id.action_postDetailsFragment_to_editPostFragment,
+                                                Bundle().apply {
+                                                    putString("EXTRA_CONTENT", post.content)
+                                                    putLong("EXTRA_ID", post.id)
+                                                }
+                                            )
+                                        viewModel.edit(post)
+                                        true
+                                    }
+
+                                    R.id.remove -> {
+                                        viewModel.removeById(post.id)
+                                        true
+                                    }
+
+                                    else -> false
+                                }
+                            }
+                        }.show()
+                    }
                 }
             }
         }

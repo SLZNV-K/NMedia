@@ -1,9 +1,12 @@
 package ru.netology.nmedia.repository
 
-import androidx.lifecycle.*
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import okhttp3.MultipartBody
@@ -11,14 +14,14 @@ import okhttp3.RequestBody.Companion.asRequestBody
 import okio.IOException
 import ru.netology.nmedia.api.PostApiService
 import ru.netology.nmedia.dao.PostDao
+import ru.netology.nmedia.dao.PostRemoteKeyDao
+import ru.netology.nmedia.db.AppDb
 import ru.netology.nmedia.dto.Attachment
 import ru.netology.nmedia.dto.AttachmentType
 import ru.netology.nmedia.dto.Media
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.PostEntity.Companion.fromDto
-import ru.netology.nmedia.entity.toDto
-import ru.netology.nmedia.entity.toEntity
 import ru.netology.nmedia.error.ApiError
 import ru.netology.nmedia.error.NetworkError
 import ru.netology.nmedia.error.UnknownError
@@ -28,55 +31,31 @@ import javax.inject.Inject
 
 class PostRepositoryRetrofitImpl @Inject constructor(
     private val dao: PostDao,
-    private val apiService: PostApiService
+    private val apiService: PostApiService,
+    private val postRemoteKeyDao: PostRemoteKeyDao,
+    appDb: AppDb
 ) : PostRepository {
-    override val data = dao.getAll().map(List<PostEntity>::toDto)
+    @OptIn(ExperimentalPagingApi::class)
+    override val data: Flow<PagingData<Post>> = Pager(
+        config = PagingConfig(pageSize = 25),
+        pagingSourceFactory = dao::getPagingSource,
+        remoteMediator = PostRemoteMediator(
+            apiService = apiService,
+            postDao = dao,
+            postRemoteKeyDao = postRemoteKeyDao,
+            appDb = appDb
+        )
+    ).flow.map { it.map(PostEntity::toDto) }
 
-    override suspend fun getAll() {
-        try {
-            val response = apiService.getAll()
-            if (!response.isSuccessful) {
-                throw ApiError(response.code(), response.message())
-            }
-            val body = response.body() ?: throw ApiError(response.code(), response.message())
-            body.map {
-                it.isSaveOnService = true
-                it.display = true
-            }
-            dao.insert(body.toEntity())
-        } catch (e: IOException) {
-            throw NetworkError
-        } catch (e: Exception) {
-            throw UnknownError
-        }
-    }
 
-    override fun getNewer(id: Long): Flow<Int> = flow {
+    override suspend fun getNewerCount(): Flow<Long> = flow {
         while (true) {
             delay(10_000L)
-            try {
-                val response = apiService.getNewer(id)
-                if (!response.isSuccessful) {
-                    throw ApiError(response.code(), response.message())
-                }
-                val body = response.body() ?: throw ApiError(response.code(), response.message())
-                body.map {
-                    it.isSaveOnService = true
-                    it.display = false
-                }
-                dao.insertShadow(body.toEntity())
-                emit(body.size)
-            } catch (e: IOException) {
-                throw NetworkError
-            } catch (e: Exception) {
-                throw UnknownError
-            }
+            emit(apiService.getNewerCount(postRemoteKeyDao.max() ?: 0L).body()?.count ?: 0L)
         }
-    }.catch { it.printStackTrace() }
-
-    override suspend fun updatePosts() {
-        dao.updatePosts()
     }
+
+    override suspend fun getPostById(id: Long) = dao.getPostById(id).toDto()
 
     override suspend fun likeById(id: Long) {
         dao.likeById(id)
@@ -161,9 +140,6 @@ class PostRepositoryRetrofitImpl @Inject constructor(
             val body = response.body() ?: throw ApiError(response.code(), response.message())
             body.isSaveOnService = true
             body.display = true
-
-//            println("Last id in dao: " + dao.getLastId())
-//            println("id server: " + body.id)
             dao.updatePostId(body.id, dao.getLastId())
             dao.updatePost(fromDto(body))
 
