@@ -1,9 +1,11 @@
 package ru.netology.nmedia.dto
 
-import java.io.Serializable
+sealed interface FeedItem {
+    val id: Long
+}
 
 data class Post(
-    val id: Long,
+    override val id: Long,
     val authorId: Long,
     val author: String,
     val authorAvatar: String,
@@ -18,14 +20,9 @@ data class Post(
     var isSaveOnService: Boolean = false,
     var display: Boolean = false,
     val ownedByMe: Boolean = false
-) : Serializable
+) : FeedItem
 
-enum class AttachmentType {
-    IMAGE
-}
-
-data class Attachment(
-    val url: String,
-    val type: AttachmentType,
-)
-
+data class Ad(
+    override val id: Long,
+    val image: String
+) : FeedItem
