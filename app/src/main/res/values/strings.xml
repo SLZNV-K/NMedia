@@ -67,4 +67,5 @@
     <string name="don_t_have_an_account_yet">Don\'t have an account yet?</string>
     <string name="fields_cannot_be_empty">Fields cannot be empty</string>
     <string name="already_have_an_account">Already have an account?</string>
+    <string name="preview_of_the_advertisement">Preview of the advertisement</string>
 </resources>

@@ -67,4 +67,5 @@
     <string name="don_t_have_an_account_yet">Еще нет аккаунта?</string>
     <string name="fields_cannot_be_empty">Поля не могут быть пустыми</string>
     <string name="already_have_an_account">Уже есть аккаунт?</string>
+    <string name="preview_of_the_advertisement">Предварительный просмотр рекламы</string>
 </resources>
