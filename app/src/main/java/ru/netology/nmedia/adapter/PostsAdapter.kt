@@ -11,9 +11,11 @@ import ru.netology.nmedia.BuildConfig.BASE_URL
 import ru.netology.nmedia.R
 import ru.netology.nmedia.databinding.CardAdBinding
 import ru.netology.nmedia.databinding.CardPostBinding
+import ru.netology.nmedia.databinding.CardTimeSeparatorBinding
 import ru.netology.nmedia.dto.Ad
 import ru.netology.nmedia.dto.FeedItem
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.dto.TimeSeparator
 import ru.netology.nmedia.util.PostDiffCallBack
 import ru.netology.nmedia.util.load
 
@@ -45,6 +47,15 @@ class PostsAdapter(
                 AdViewHolder(view)
             }
 
+            R.layout.card_time_separator -> {
+                val view = CardTimeSeparatorBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+                TimeSeparatorHolder(view)
+            }
+
             else -> error("Unknown item type: $viewType")
         }
 
@@ -53,6 +64,7 @@ class PostsAdapter(
         when (getItem(position)) {
             is Ad -> R.layout.card_ad
             is Post -> R.layout.card_post
+            is TimeSeparator -> R.layout.card_time_separator
             null -> error("Unknown item type")
         }
 
@@ -61,6 +73,7 @@ class PostsAdapter(
         when (val item = getItem(position)) {
             is Ad -> (holder as AdViewHolder).bind(item)
             is Post -> (holder as PostsViewHolder).bind(item)
+            is TimeSeparator -> (holder as TimeSeparatorHolder).bind(item)
             null -> error("Unknown item type")
         }
     }
@@ -75,6 +88,15 @@ class AdViewHolder(
     }
 }
 
+class TimeSeparatorHolder(
+    private val binding: CardTimeSeparatorBinding
+) : RecyclerView.ViewHolder(binding.root) {
+
+    fun bind(separator: TimeSeparator) {
+        binding.textSeparator.text = separator.text
+    }
+}
+
 class PostsViewHolder(
     private val binding: CardPostBinding,
     private val onInteractionListener: OnInteractionListener
@@ -82,7 +104,7 @@ class PostsViewHolder(
     fun bind(post: Post) {
         with(binding) {
             author.text = post.author
-            published.text = post.published
+            published.text = post.published.toString()
             avatar.load("${BASE_URL}/avatars/${post.authorAvatar}", true)
             newContent.text = post.content
             like.isChecked = post.likedByMe

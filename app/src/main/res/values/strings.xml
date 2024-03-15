@@ -44,7 +44,6 @@
     <string name="preview_of_photo">Preview of photo</string>
     <string name="make_the_photo">Make the photo</string>
     <string name="choose_the_photo">Choose the photo</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="make_the_comment">Make the comment</string>
     <string name="full_screen_photo">Full-screen photo</string>
     <string name="description_the_back_button">The back button</string>
@@ -68,4 +67,5 @@
     <string name="fields_cannot_be_empty">Fields cannot be empty</string>
     <string name="already_have_an_account">Already have an account?</string>
     <string name="preview_of_the_advertisement">Preview of the advertisement</string>
+    <string name="today">Today</string>
 </resources>

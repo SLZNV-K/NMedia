@@ -23,7 +23,7 @@ import ru.netology.nmedia.util.SingleLiveEvent
 import javax.inject.Inject
 
 private val empty = Post(
-    id = 0, authorId = 0, content = "", author = "", authorAvatar = "", published = ""
+    id = 0, authorId = 0, content = "", author = "", authorAvatar = "", published = 0
 )
 private val noPhoto = PhotoModel()
 

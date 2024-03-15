@@ -23,6 +23,7 @@ import ru.netology.nmedia.dto.AttachmentType
 import ru.netology.nmedia.dto.FeedItem
 import ru.netology.nmedia.dto.Media
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.dto.TimeSeparator
 import ru.netology.nmedia.entity.PostEntity
 import ru.netology.nmedia.entity.PostEntity.Companion.fromDto
 import ru.netology.nmedia.error.ApiError
@@ -51,6 +52,17 @@ class PostRepositoryRetrofitImpl @Inject constructor(
         )
     ).flow.map {
         it.map(PostEntity::toDto)
+            .insertSeparators { prev, next ->
+                if (prev is Post && next is Post) {
+                    if (timingSeparators(prev.published) != timingSeparators(next.published)) {
+                        TimeSeparator(Random.nextLong(), timingSeparators(next.published))
+                    } else {
+                        null
+                    }
+                } else {
+                    null
+                }
+            }
             .insertSeparators { previous, _ ->
                 if (previous?.id?.rem(5) == 0L) {
                     Ad(Random.nextLong(), "figma.jpg")
@@ -58,6 +70,7 @@ class PostRepositoryRetrofitImpl @Inject constructor(
                     null
                 }
             }
+
     }
 
 
@@ -135,7 +148,7 @@ class PostRepositoryRetrofitImpl @Inject constructor(
             fromDto(
                 post.copy(
                     author = "User",
-                    published = "Now",
+                    published = 0,
                     isSaveOnService = false,
                     display = true
                 )
@@ -169,5 +182,20 @@ class PostRepositoryRetrofitImpl @Inject constructor(
         return apiService.upload(
             MultipartBody.Part.createFormData("file", file.name, file.asRequestBody())
         )
+    }
+
+    private fun timingSeparators(published: Long): String {
+        val millisInDay = 24 * 60 * 60 * 1000
+
+        val diff: Long = System.currentTimeMillis() - published
+        val diffDays: Long = diff / millisInDay
+
+        return if (diffDays < 1) {
+            "Сегодня"
+        } else if (diffDays < 2) {
+            "Вчера"
+        } else {
+            "На прошлой неделе"
+        }
     }
 }

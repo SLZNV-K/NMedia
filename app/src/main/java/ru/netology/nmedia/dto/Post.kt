@@ -10,7 +10,7 @@ data class Post(
     val author: String,
     val authorAvatar: String,
     val content: String,
-    val published: String,
+    val published: Long,
     val likes: Int = 0,
     val likedByMe: Boolean = false,
     val shares: Int = 0,
@@ -25,4 +25,9 @@ data class Post(
 data class Ad(
     override val id: Long,
     val image: String
+) : FeedItem
+
+data class TimeSeparator(
+    override val id: Long,
+    val text: String
 ) : FeedItem
