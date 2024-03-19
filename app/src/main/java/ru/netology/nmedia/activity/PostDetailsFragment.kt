@@ -56,7 +56,7 @@ class PostDetailsFragment : Fragment() {
             viewModel.pickedPost.observe(viewLifecycleOwner) { post ->
                 with(binding) {
                     author.text = post.author
-                    published.text = post.published
+                    published.text = post.published.toString()
                     avatar.load("${BASE_URL}/avatars/${post.authorAvatar}", true)
                     newContent.text = post.content
                     like.isChecked = post.likedByMe
