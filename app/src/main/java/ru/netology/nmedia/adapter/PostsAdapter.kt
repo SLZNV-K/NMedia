@@ -63,18 +63,30 @@ class PostsAdapter(
     override fun getItemViewType(position: Int): Int =
         when (getItem(position)) {
             is Ad -> R.layout.card_ad
+            null,
             is Post -> R.layout.card_post
+
             is TimeSeparator -> R.layout.card_time_separator
-            null -> error("Unknown item type")
+
         }
 
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = getItem(position)) {
             is Ad -> (holder as AdViewHolder).bind(item)
-            is Post -> (holder as PostsViewHolder).bind(item)
+            null,
+            is Post -> (holder as PostsViewHolder).bind(
+                item as? Post ?: Post(
+                    id = 0,
+                    authorId = 0,
+                    content = "",
+                    author = "",
+                    authorAvatar = "",
+                    published = 0
+                )
+            )
+
             is TimeSeparator -> (holder as TimeSeparatorHolder).bind(item)
-            null -> error("Unknown item type")
         }
     }
 }

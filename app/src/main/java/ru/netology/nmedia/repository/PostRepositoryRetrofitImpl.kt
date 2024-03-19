@@ -52,18 +52,19 @@ class PostRepositoryRetrofitImpl @Inject constructor(
         )
     ).flow.map {
         it.map(PostEntity::toDto)
-            .insertSeparators { prev, next ->
+            .insertSeparators { prev: FeedItem?, next: FeedItem? ->
                 if (prev is Post && next is Post) {
                     if (timingSeparators(prev.published) != timingSeparators(next.published)) {
                         TimeSeparator(Random.nextLong(), timingSeparators(next.published))
                     } else {
                         null
                     }
+                } else if (prev == null && next is Post) {
+                    TimeSeparator(Random.nextLong(), timingSeparators(next.published))
                 } else {
                     null
                 }
-            }
-            .insertSeparators { previous, _ ->
+            }.insertSeparators { previous, _ ->
                 if (previous?.id?.rem(5) == 0L) {
                     Ad(Random.nextLong(), "figma.jpg")
                 } else {
@@ -187,8 +188,8 @@ class PostRepositoryRetrofitImpl @Inject constructor(
     private fun timingSeparators(published: Long): String {
         val millisInDay = 24 * 60 * 60 * 1000
 
-        val diff: Long = System.currentTimeMillis() - published
-        val diffDays: Long = diff / millisInDay
+        val diff: Float = System.currentTimeMillis().toFloat() - published * 1000f
+        val diffDays: Float = diff / millisInDay
 
         return if (diffDays < 1) {
             "Сегодня"
