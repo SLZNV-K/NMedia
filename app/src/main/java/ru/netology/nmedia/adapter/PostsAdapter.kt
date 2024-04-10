@@ -7,9 +7,15 @@ import android.widget.PopupMenu
 import androidx.core.view.isVisible
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
+import ru.netology.nmedia.BuildConfig.BASE_URL
 import ru.netology.nmedia.R
+import ru.netology.nmedia.databinding.CardAdBinding
 import ru.netology.nmedia.databinding.CardPostBinding
+import ru.netology.nmedia.databinding.CardTimeSeparatorBinding
+import ru.netology.nmedia.dto.Ad
+import ru.netology.nmedia.dto.FeedItem
 import ru.netology.nmedia.dto.Post
+import ru.netology.nmedia.dto.TimeSeparator
 import ru.netology.nmedia.util.PostDiffCallBack
 import ru.netology.nmedia.util.load
 
@@ -25,16 +31,81 @@ interface OnInteractionListener {
 
 class PostsAdapter(
     private val onInteractionListener: OnInteractionListener
-) : PagingDataAdapter<Post, PostsViewHolder>(PostDiffCallBack) {
+) : PagingDataAdapter<FeedItem, RecyclerView.ViewHolder>(PostDiffCallBack) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostsViewHolder {
-        val view = CardPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return PostsViewHolder(view, onInteractionListener)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+        when (viewType) {
+            R.layout.card_post -> {
+                val view =
+                    CardPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                PostsViewHolder(view, onInteractionListener)
+            }
+
+            R.layout.card_ad -> {
+                val view = CardAdBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                AdViewHolder(view)
+            }
+
+            R.layout.card_time_separator -> {
+                val view = CardTimeSeparatorBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+                TimeSeparatorHolder(view)
+            }
+
+            else -> error("Unknown item type: $viewType")
+        }
+
+
+    override fun getItemViewType(position: Int): Int =
+        when (getItem(position)) {
+            is Ad -> R.layout.card_ad
+            null,
+            is Post -> R.layout.card_post
+
+            is TimeSeparator -> R.layout.card_time_separator
+
+        }
+
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (val item = getItem(position)) {
+            is Ad -> (holder as AdViewHolder).bind(item)
+            null,
+            is Post -> (holder as PostsViewHolder).bind(
+                item as? Post ?: Post(
+                    id = 0,
+                    authorId = 0,
+                    content = "",
+                    author = "",
+                    authorAvatar = "",
+                    published = 0
+                )
+            )
+
+            is TimeSeparator -> (holder as TimeSeparatorHolder).bind(item)
+        }
     }
+}
 
-    override fun onBindViewHolder(holder: PostsViewHolder, position: Int) {
-        val post = getItem(position) ?: return
-        holder.bind(post)
+class AdViewHolder(
+    private val binding: CardAdBinding
+) : RecyclerView.ViewHolder(binding.root) {
+
+    fun bind(ad: Ad) {
+        binding.image.load("${BASE_URL}/media/${ad.image}")
+    }
+}
+
+class TimeSeparatorHolder(
+    private val binding: CardTimeSeparatorBinding
+) : RecyclerView.ViewHolder(binding.root) {
+
+    fun bind(separator: TimeSeparator) {
+        binding.textSeparator.text = separator.text
     }
 }
 
@@ -42,11 +113,10 @@ class PostsViewHolder(
     private val binding: CardPostBinding,
     private val onInteractionListener: OnInteractionListener
 ) : RecyclerView.ViewHolder(binding.root) {
-    private val BASE_URL = "http://10.0.2.2:9999"
     fun bind(post: Post) {
         with(binding) {
             author.text = post.author
-            published.text = post.published
+            published.text = post.published.toString()
             avatar.load("${BASE_URL}/avatars/${post.authorAvatar}", true)
             newContent.text = post.content
             like.isChecked = post.likedByMe

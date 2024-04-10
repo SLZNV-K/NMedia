@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.netology.nmedia.auth.AppAuth
+import ru.netology.nmedia.dto.FeedItem
 import ru.netology.nmedia.dto.Post
 import ru.netology.nmedia.model.FeedModelState
 import ru.netology.nmedia.model.PhotoModel
@@ -22,7 +23,7 @@ import ru.netology.nmedia.util.SingleLiveEvent
 import javax.inject.Inject
 
 private val empty = Post(
-    id = 0, authorId = 0, content = "", author = "", authorAvatar = "", published = ""
+    id = 0, authorId = 0, content = "", author = "", authorAvatar = "", published = 0
 )
 private val noPhoto = PhotoModel()
 
@@ -35,10 +36,14 @@ class PostViewModel @Inject constructor(
 
     private val cached = repository.data.cachedIn(viewModelScope)
 
-    val data: Flow<PagingData<Post>> = appAuth.authState.flatMapLatest { (myId, _) ->
+    val data: Flow<PagingData<FeedItem>> = appAuth.authState.flatMapLatest { (myId, _) ->
         cached.map { pagingData ->
             pagingData.map { post ->
-                post.copy(ownedByMe = post.authorId == myId)
+                if (post is Post) {
+                    post.copy(ownedByMe = post.authorId == myId)
+                } else {
+                    post
+                }
             }
         }
     }
